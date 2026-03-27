@@ -28,13 +28,13 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore ./PaqueGo.App/PaqueGo.App.csproj
+        run: dotnet restore ./PaqueGo.slnx
 
       - name: Test
         run: dotnet test ./PaqueGo.App.Tests/PaqueGo.App.Tests.csproj --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./PaqueGo.App/PaqueGo.App.csproj --configuration Release -o publish
+        run: dotnet publish ./PaqueGo.App/PaqueGo.App.csproj --configuration Release --no-restore -o publish
 
       - name: Prepare Pages artifact
         shell: pwsh
