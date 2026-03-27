@@ -1,0 +1,35 @@
+<div class="heat-indicator heat-@Level.ToString().ToLowerInvariant()">
+    <div class="heat-lights" aria-hidden="true">
+        <span class="heat-light @(Level == HeatLevel.Cold ? "active" : string.Empty)"></span>
+        <span class="heat-light @(Level == HeatLevel.Warm ? "active" : string.Empty)"></span>
+        <span class="heat-light @(Level == HeatLevel.Hot ? "active" : string.Empty)"></span>
+    </div>
+    <div class="heat-copy">
+        <strong>@Title</strong>
+        <span>@Subtitle</span>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public HeatLevel Level { get; set; }
+
+    [Parameter]
+    public double? DistanceMeters { get; set; }
+
+    private string Title => Level switch
+    {
+        HeatLevel.Hot => "Chaud",
+        HeatLevel.Warm => "Tiede",
+        HeatLevel.Cold => "Froid",
+        _ => "Recherche"
+    };
+
+    private string Subtitle => Level switch
+    {
+        HeatLevel.Hot => "Moins de 5 metres. Regarde partout autour de toi !",
+        HeatLevel.Warm => "Moins de 10 metres. Tu arrives bientot.",
+        HeatLevel.Cold => $"Encore {HuntMath.ToFriendlyDistance(DistanceMeters)} environ.",
+        _ => "Bouge un peu pour reveiller la boussole."
+    };
+}

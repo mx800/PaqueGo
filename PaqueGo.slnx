@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PaqueGo.App.Tests/PaqueGo.App.Tests.csproj" />
+  <Project Path="PaqueGo.App/PaqueGo.App.csproj" />
+</Solution>

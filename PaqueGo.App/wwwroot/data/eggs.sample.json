@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Oeuf arc-en-ciel",
+    "latitude": 48.85662,
+    "longitude": 2.35223,
+    "hint": "Pres d'un coin bien fleuri"
+  },
+  {
+    "name": "Oeuf soleil",
+    "latitude": 48.85674,
+    "longitude": 2.35246,
+    "hint": "Regarde vers un endroit lumineux"
+  },
+  {
+    "name": "Oeuf lapin",
+    "latitude": 48.85649,
+    "longitude": 2.3527,
+    "hint": "Le lapin aime les cachettes a l'ombre"
+  },
+  {
+    "name": "Oeuf menthe",
+    "latitude": 48.85631,
+    "longitude": 2.35235,
+    "hint": "Cherche pres d'un petit chemin"
+  }
+]

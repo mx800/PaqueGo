@@ -1,0 +1,16 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>PaqueGo</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <div class="not-found-card" role="alert">
+                <h1>Oups, ce sentier n'existe pas.</h1>
+                <p>Retourne a l'accueil pour reprendre la chasse aux oeufs.</p>
+                <RadzenButton Text="Retour a la chasse" Path="/" Icon="home" />
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

@@ -1,0 +1,4 @@
+{
+  "targetUrl": "http://host.docker.internal:5167",
+  "mcpUrl": "http://localhost:8931/mcp"
+}

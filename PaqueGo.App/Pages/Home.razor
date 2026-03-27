@@ -1,0 +1,305 @@
+﻿@page "/hunt"
+@implements IDisposable
+@inject EggHuntService HuntService
+@inject NavigationManager Navigation
+
+<PageTitle>Chasse aux trésors de Pâque</PageTitle>
+
+<div class="hunt-screen hunt-play-screen heat-@HuntService.HeatLevel.ToString().ToLowerInvariant()">
+	<div class="sky-layer">
+		<span class="cloud cloud-one"></span>
+		<span class="cloud cloud-two"></span>
+		<span class="cloud cloud-three"></span>
+		<span class="spark spark-one"></span>
+		<span class="spark spark-two"></span>
+		<span class="spark spark-three"></span>
+	</div>
+
+	@if (showTransition)
+	{
+		<div class="transition-overlay" aria-hidden="true">
+			<div class="transition-card">
+				<div class="transition-ribbon">La chasse commence</div>
+				<h1>Chasse aux trésors de Pâque</h1>
+				<p>Les oeufs scintillent, la boussole s'eveille et le jardin se transforme en terrain d'aventure.</p>
+				<div class="transition-eggs">
+					<span class="transition-egg egg-one"></span>
+					<span class="transition-egg egg-two"></span>
+					<span class="transition-egg egg-three"></span>
+				</div>
+			</div>
+		</div>
+	}
+
+	<section class="play-stage">
+		<div class="play-header hero-card">
+			<div class="hero-copy">
+				<div class="eyebrow">Page de chasse</div>
+				<h1>@HeroTitle</h1>
+				@if (!string.IsNullOrWhiteSpace(runtimeMessage))
+				{
+					<div class="upload-message is-error">@runtimeMessage</div>
+				}
+			</div>
+
+			<div class="play-header-chips">
+				<div class="target-chip">@TargetChipLabel</div>
+				<div class="progress-badge">@HuntService.FoundCount/@HuntService.TotalCount</div>
+			</div>
+		</div>
+
+		<section class="play-layout">
+			<RadzenCard class="game-card compass-card immersive-compass-card">
+			<div class="card-head">
+				<div>
+					<div class="section-label">Grande boussole</div>
+					<h2>@CompassTitle</h2>
+				</div>
+				<div class="target-chip">@HeatChipLabel</div>
+			</div>
+
+			<CompassDisplay RelativeBearingDegrees="@HuntService.RelativeBearingDegrees"
+							DistanceMeters="@HuntService.DistanceToTargetMeters"
+							HeatLevel="@HuntService.HeatLevel"
+							IsLive="@HuntService.Snapshot.IsHeadingAvailable"
+							TargetName="@HuntService.ActiveTarget?.Name" />
+
+			<HeatIndicator Level="@HuntService.HeatLevel" DistanceMeters="@HuntService.DistanceToTargetMeters" />
+		</RadzenCard>
+
+		<div class="stack-column">
+			<RadzenCard class="game-card mission-card status-card">
+				<div class="card-head compact">
+					<div>
+						<div class="section-label">Mission du moment</div>
+						<h2>@(HuntService.ActiveTarget?.Name ?? "On attend le prochain oeuf")</h2>
+					</div>
+					<div class="progress-badge">@DisplayModeLabel</div>
+				</div>
+
+				<p class="mission-message">@HuntService.PlayerMessage</p>
+
+				@if (!string.IsNullOrWhiteSpace(HuntService.ActiveTarget?.Hint))
+				{
+					<div class="hint-bubble">Indice : @HuntService.ActiveTarget.Hint</div>
+				}
+
+				<RadzenProgressBar Value="@ProgressValue"
+								   Min="0"
+								   Max="100"
+								   ShowValue="false"
+								   class="hunt-progress" />
+
+				<div class="metrics-row">
+					<div class="metric-card">
+						<span class="metric-label">Distance</span>
+						<strong>@DistanceLabel</strong>
+					</div>
+					<div class="metric-card">
+						<span class="metric-label">Boussole</span>
+						<strong>@HeadingLabel</strong>
+					</div>
+					<div class="metric-card">
+						<span class="metric-label">Zone</span>
+						<strong>@HuntService.HeatLevelLabel</strong>
+					</div>
+				</div>
+
+				<RadzenStack Gap="0.75rem" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal">
+					<RadzenButton Text="Oeuf trouve !"
+								  Icon="egg_alt"
+								  Click="@MarkCurrentTargetFoundAsync"
+								  Disabled="@(HuntService.ActiveTarget is null)"
+								  class="success-button" />
+					<RadzenButton Text="Actualiser" Icon="explore" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Flat" Click="@RefreshAsync" />
+				</RadzenStack>
+
+				@if (HuntService.IsCompleted)
+				{
+					<div class="celebration-box">
+						<h3>Bravo, tous les oeufs sont trouves !</h3>
+						<p>Le lapin de Paques saute de joie.</p>
+					</div>
+				}
+			</RadzenCard>
+
+			<RadzenCard class="game-card organizer-card sensory-card">
+				<div class="card-head compact">
+					<div>
+						<div class="section-label">Piste active</div>
+						<h2>Ambiance du jardin</h2>
+					</div>
+					<div class="target-chip">@HuntService.DataSourceLabel</div>
+				</div>
+
+				<div class="organizer-body sensory-body">
+					<div class="status-grid">
+						<div class="data-card">
+							<span class="metric-label">Localisation</span>
+							<strong>@LocationStatusLabel</strong>
+						</div>
+						<div class="data-card">
+							<span class="metric-label">Precision GPS</span>
+							<strong>@AccuracyLabel</strong>
+						</div>
+						<div class="data-card">
+							<span class="metric-label">Affichage</span>
+							<strong>@DisplayModeLabel</strong>
+						</div>
+						<div class="data-card">
+							<span class="metric-label">Oeufs restants</span>
+							<strong>@RemainingCountLabel</strong>
+						</div>
+					</div>
+
+					<RadzenButton Text="Rejouer"
+							  Icon="refresh"
+							  ButtonStyle="ButtonStyle.Light"
+							  Variant="Variant.Flat"
+							  Click="@ResetAsync" />
+				</div>
+			</RadzenCard>
+		</div>
+	</section>
+	</section>
+
+	@if (HuntService.IsCompleted)
+	{
+		<div class="confetti-rain" aria-hidden="true">
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+	}
+</div>
+
+@code {
+	private readonly PeriodicTimer _refreshTimer = new(TimeSpan.FromSeconds(1));
+	private readonly CancellationTokenSource _refreshCts = new();
+	private bool showTransition = true;
+	private string? runtimeMessage;
+
+	protected override async Task OnInitializedAsync()
+	{
+		HuntService.StateChanged += HandleStateChanged;
+		try
+		{
+			await HuntService.InitializeAsync();
+
+			if (!HuntService.HasTargets)
+			{
+				Navigation.NavigateTo("/", replace: true);
+				return;
+			}
+
+			_ = PollAsync(_refreshCts.Token);
+		}
+		catch (Exception exception)
+		{
+			runtimeMessage = $"L'application n'a pas pu demarrer correctement : {exception.Message}";
+		}
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender || !HuntService.HasTargets)
+		{
+			return;
+		}
+
+		await HuntService.ResumeSensorsAsync();
+		await HuntService.TryEnterFullscreenAsync();
+		await Task.Delay(2200);
+		showTransition = false;
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private string HeroTitle => HuntService.IsCompleted
+		? "Mission arc-en-ciel terminee !"
+		: "La boussole te guide vers le prochain tresor";
+
+	private string CompassTitle => HuntService.IsCompleted
+		? "Feu d'artifice de Paques"
+		: "Grande boussole enchantee";
+
+	private string TargetChipLabel => HuntService.ActiveTarget is null
+		? "Aucune cible"
+		: $"Cible : {HuntService.ActiveTarget.Name}";
+
+	private string HeatChipLabel => $"Zone : {HuntService.HeatLevelLabel}";
+
+	private string DistanceLabel => HuntMath.ToFriendlyDistance(HuntService.DistanceToTargetMeters);
+
+	private string HeadingLabel => HuntService.Snapshot.IsHeadingAvailable ? "Boussole active" : "Distance uniquement";
+
+	private string DisplayModeLabel => HuntService.DisplayState.IsFullscreen || HuntService.DisplayState.IsStandalone
+		? "Immersion active"
+		: "Mode navigateur";
+
+	private string AccuracyLabel => HuntService.Snapshot.AccuracyMeters is double accuracyMeters
+		? $"{Math.Round(accuracyMeters)} m"
+		: "En attente";
+
+	private string LocationStatusLabel => HuntService.Snapshot.IsLocationAvailable
+		? "Position captee"
+		: "Autorise la localisation";
+
+	private string RemainingCountLabel => $"{Math.Max(HuntService.TotalCount - HuntService.FoundCount, 0)} restant(s)";
+
+	private double ProgressValue => HuntService.TotalCount == 0
+		? 0
+		: HuntService.FoundCount * 100d / HuntService.TotalCount;
+
+	private async Task PollAsync(CancellationToken cancellationToken)
+	{
+		try
+		{
+			while (await _refreshTimer.WaitForNextTickAsync(cancellationToken))
+			{
+				await HuntService.RefreshAsync();
+			}
+		}
+		catch (OperationCanceledException)
+		{
+		}
+		catch (ObjectDisposedException)
+		{
+		}
+		catch (Exception exception)
+		{
+			runtimeMessage = $"Le rafraichissement automatique a ete interrompu : {exception.Message}";
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+
+	private void HandleStateChanged()
+	{
+		_ = InvokeAsync(StateHasChanged);
+	}
+
+	private async Task RefreshAsync()
+	{
+		await HuntService.RefreshAsync();
+	}
+
+	private async Task ResetAsync()
+	{
+		await HuntService.ResetProgressAsync();
+	}
+
+	private async Task MarkCurrentTargetFoundAsync()
+	{
+		await HuntService.MarkCurrentTargetFoundAsync();
+	}
+
+	public void Dispose()
+	{
+		HuntService.StateChanged -= HandleStateChanged;
+		_refreshCts.Cancel();
+		_refreshTimer.Dispose();
+		_refreshCts.Dispose();
+	}
+}

@@ -1,0 +1,74 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore ./PaqueGo.App/PaqueGo.App.csproj
+
+      - name: Test
+        run: dotnet test ./PaqueGo.App.Tests/PaqueGo.App.Tests.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ./PaqueGo.App/PaqueGo.App.csproj --configuration Release -o publish
+
+      - name: Prepare Pages artifact
+        shell: pwsh
+        run: |
+          $repoName = "${{ github.event.repository.name }}"
+          $wwwroot = Join-Path $PWD "publish/wwwroot"
+          $indexPath = Join-Path $wwwroot "index.html"
+          $manifestPath = Join-Path $wwwroot "manifest.webmanifest"
+
+          (Get-Content $indexPath -Raw).Replace('<base href="/" />', "<base href='/$repoName/' />") | Set-Content $indexPath
+
+          $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+          $manifest.id = "/$repoName/"
+          $manifest.start_url = "/$repoName/"
+          $manifest | ConvertTo-Json -Depth 5 | Set-Content $manifestPath
+
+          Copy-Item $indexPath (Join-Path $wwwroot "404.html") -Force
+          New-Item -ItemType File -Path (Join-Path $wwwroot ".nojekyll") -Force | Out-Null
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish/wwwroot
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

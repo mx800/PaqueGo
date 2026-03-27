@@ -1,0 +1,43 @@
+<div class="compass-shell heat-@HeatLevel.ToString().ToLowerInvariant()">
+    <div class="orbit orbit-one"></div>
+    <div class="orbit orbit-two"></div>
+    <div class="compass-star star-one"></div>
+    <div class="compass-star star-two"></div>
+
+    <div class="compass-ring">
+        <span class="cardinal top">N</span>
+        <span class="cardinal right">E</span>
+        <span class="cardinal bottom">S</span>
+        <span class="cardinal left">O</span>
+        <div class="compass-pointer @(IsLive ? "is-live" : "")" style="transform: @PointerRotation;">
+            <span class="pointer-head"></span>
+            <span class="pointer-tail"></span>
+        </div>
+        <div class="compass-core">
+            <span class="compass-target">@(TargetName ?? "En attente")</span>
+            <span class="compass-distance">@DistanceLabel</span>
+            <span class="compass-subtitle">@(IsLive ? "La fleche suit le prochain oeuf" : "La distance reste visible meme sans boussole")</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public double? RelativeBearingDegrees { get; set; }
+
+    [Parameter]
+    public double? DistanceMeters { get; set; }
+
+    [Parameter]
+    public HeatLevel HeatLevel { get; set; }
+
+    [Parameter]
+    public bool IsLive { get; set; }
+
+    [Parameter]
+    public string? TargetName { get; set; }
+
+    private string PointerRotation => $"rotate({(RelativeBearingDegrees ?? 0d):0.##}deg)";
+
+    private string DistanceLabel => HuntMath.ToFriendlyDistance(DistanceMeters);
+}
