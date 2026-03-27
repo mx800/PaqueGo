@@ -28,8 +28,8 @@
     private string Subtitle => Level switch
     {
         HeatLevel.Hot => "Moins de 5 metres. Regarde partout autour de toi !",
-        HeatLevel.Warm => "Moins de 10 metres. Tu arrives bientot.",
-        HeatLevel.Cold => $"Encore {HuntMath.ToFriendlyDistance(DistanceMeters)} environ.",
+        HeatLevel.Warm => "Tu arrives bientot.",
+        HeatLevel.Cold => "Continue d'avancer vers le tresor.",
         _ => "Bouge un peu pour reveiller la boussole."
     };
 }

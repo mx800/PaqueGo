@@ -5,10 +5,8 @@
     --panel-strong: rgba(255, 255, 255, 0.94);
     --ink: #5b4b58;
     --pink: #ff8fb4;
-    --pink-dark: #e45685;
     --yellow: #ffd86b;
     --mint: #9ee8c4;
-    --blue: #80cfff;
     --coral: #ff9e7a;
     --lavender: #c8b6ff;
     --shadow: 0 18px 45px rgba(174, 118, 118, 0.16);
@@ -994,14 +992,16 @@ a {
 
 .play-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 1rem;
     align-items: center;
-    padding: 1.15rem 1.35rem;
+    padding: 0.95rem 1.35rem;
+    min-height: 0;
 }
 
 .play-header .hero-copy h1 {
-    font-size: clamp(1.9rem, 4.5vw, 3.1rem);
+    margin: 0;
+    font-size: clamp(1.55rem, 4vw, 2.3rem);
 }
 
 .play-header-chips {
@@ -1013,9 +1013,38 @@ a {
 
 .immersive-compass-card {
     min-height: 740px;
+    display: grid;
+    align-content: start;
     background:
         radial-gradient(circle at top, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.74) 36%, rgba(255, 250, 239, 0.58) 100%),
         linear-gradient(180deg, rgba(165, 220, 255, 0.28) 0%, rgba(255, 216, 107, 0.2) 100%);
+}
+
+.play-layout {
+    grid-template-columns: minmax(0, 880px);
+    justify-content: center;
+}
+
+.compass-summary {
+    text-align: center;
+    margin-top: 0.9rem;
+}
+
+.compact-metrics-row {
+    margin-top: 0.5rem;
+}
+
+.compass-footer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+}
+
+.compass-primary-action {
+    min-width: min(100%, 280px);
 }
 
 .status-card,
@@ -1281,5 +1310,10 @@ a {
 
     .builder-add-button {
         width: 100%;
+    }
+
+    .compass-footer-actions {
+        flex-direction: column;
+        align-items: stretch;
     }
 }

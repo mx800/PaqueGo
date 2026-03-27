@@ -34,29 +34,22 @@
 	<section class="play-stage">
 		<div class="play-header hero-card">
 			<div class="hero-copy">
-				<div class="eyebrow">Page de chasse</div>
 				<h1>@HeroTitle</h1>
 				@if (!string.IsNullOrWhiteSpace(runtimeMessage))
 				{
 					<div class="upload-message is-error">@runtimeMessage</div>
 				}
 			</div>
-
-			<div class="play-header-chips">
-				<div class="target-chip">@TargetChipLabel</div>
-				<div class="progress-badge">@HuntService.FoundCount/@HuntService.TotalCount</div>
-			</div>
 		</div>
 
 		<section class="play-layout">
 			<RadzenCard class="game-card compass-card immersive-compass-card">
-			<div class="card-head">
-				<div>
-					<div class="section-label">Grande boussole</div>
-					<h2>@CompassTitle</h2>
+				<div class="card-head compact">
+					<div>
+						<div class="section-label">Direction</div>
+						<h2>@CompassTitle</h2>
+					</div>
 				</div>
-				<div class="target-chip">@HeatChipLabel</div>
-			</div>
 
 			<CompassDisplay RelativeBearingDegrees="@HuntService.RelativeBearingDegrees"
 							DistanceMeters="@HuntService.DistanceToTargetMeters"
@@ -65,19 +58,6 @@
 							TargetName="@HuntService.ActiveTarget?.Name" />
 
 			<HeatIndicator Level="@HuntService.HeatLevel" DistanceMeters="@HuntService.DistanceToTargetMeters" />
-		</RadzenCard>
-
-		<div class="stack-column">
-			<RadzenCard class="game-card mission-card status-card">
-				<div class="card-head compact">
-					<div>
-						<div class="section-label">Mission du moment</div>
-						<h2>@(HuntService.ActiveTarget?.Name ?? "On attend le prochain oeuf")</h2>
-					</div>
-					<div class="progress-badge">@DisplayModeLabel</div>
-				</div>
-
-				<p class="mission-message">@HuntService.PlayerMessage</p>
 
 				@if (!string.IsNullOrWhiteSpace(HuntService.ActiveTarget?.Hint))
 				{
@@ -90,29 +70,18 @@
 								   ShowValue="false"
 								   class="hunt-progress" />
 
-				<div class="metrics-row">
-					<div class="metric-card">
-						<span class="metric-label">Distance</span>
-						<strong>@DistanceLabel</strong>
-					</div>
-					<div class="metric-card">
-						<span class="metric-label">Boussole</span>
-						<strong>@HeadingLabel</strong>
-					</div>
-					<div class="metric-card">
-						<span class="metric-label">Zone</span>
-						<strong>@HuntService.HeatLevelLabel</strong>
-					</div>
-				</div>
-
-				<RadzenStack Gap="0.75rem" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal">
+				<div class="compass-footer-actions">
 					<RadzenButton Text="Oeuf trouve !"
 								  Icon="egg_alt"
 								  Click="@MarkCurrentTargetFoundAsync"
 								  Disabled="@(HuntService.ActiveTarget is null)"
-								  class="success-button" />
-					<RadzenButton Text="Actualiser" Icon="explore" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Flat" Click="@RefreshAsync" />
-				</RadzenStack>
+								  class="success-button compass-primary-action" />
+					<RadzenButton Text="Actualiser"
+								  Icon="explore"
+								  ButtonStyle="ButtonStyle.Secondary"
+								  Variant="Variant.Flat"
+								  Click="@RefreshAsync" />
+				</div>
 
 				@if (HuntService.IsCompleted)
 				{
@@ -122,44 +91,6 @@
 					</div>
 				}
 			</RadzenCard>
-
-			<RadzenCard class="game-card organizer-card sensory-card">
-				<div class="card-head compact">
-					<div>
-						<div class="section-label">Piste active</div>
-						<h2>Ambiance du jardin</h2>
-					</div>
-					<div class="target-chip">@HuntService.DataSourceLabel</div>
-				</div>
-
-				<div class="organizer-body sensory-body">
-					<div class="status-grid">
-						<div class="data-card">
-							<span class="metric-label">Localisation</span>
-							<strong>@LocationStatusLabel</strong>
-						</div>
-						<div class="data-card">
-							<span class="metric-label">Precision GPS</span>
-							<strong>@AccuracyLabel</strong>
-						</div>
-						<div class="data-card">
-							<span class="metric-label">Affichage</span>
-							<strong>@DisplayModeLabel</strong>
-						</div>
-						<div class="data-card">
-							<span class="metric-label">Oeufs restants</span>
-							<strong>@RemainingCountLabel</strong>
-						</div>
-					</div>
-
-					<RadzenButton Text="Rejouer"
-							  Icon="refresh"
-							  ButtonStyle="ButtonStyle.Light"
-							  Variant="Variant.Flat"
-							  Click="@ResetAsync" />
-				</div>
-			</RadzenCard>
-		</div>
 	</section>
 	</section>
 
@@ -222,32 +153,8 @@
 		: "La boussole te guide vers le prochain tresor";
 
 	private string CompassTitle => HuntService.IsCompleted
-		? "Feu d'artifice de Paques"
-		: "Grande boussole enchantee";
-
-	private string TargetChipLabel => HuntService.ActiveTarget is null
-		? "Aucune cible"
-		: $"Cible : {HuntService.ActiveTarget.Name}";
-
-	private string HeatChipLabel => $"Zone : {HuntService.HeatLevelLabel}";
-
-	private string DistanceLabel => HuntMath.ToFriendlyDistance(HuntService.DistanceToTargetMeters);
-
-	private string HeadingLabel => HuntService.Snapshot.IsHeadingAvailable ? "Boussole active" : "Distance uniquement";
-
-	private string DisplayModeLabel => HuntService.DisplayState.IsFullscreen || HuntService.DisplayState.IsStandalone
-		? "Immersion active"
-		: "Mode navigateur";
-
-	private string AccuracyLabel => HuntService.Snapshot.AccuracyMeters is double accuracyMeters
-		? $"{Math.Round(accuracyMeters)} m"
-		: "En attente";
-
-	private string LocationStatusLabel => HuntService.Snapshot.IsLocationAvailable
-		? "Position captee"
-		: "Autorise la localisation";
-
-	private string RemainingCountLabel => $"{Math.Max(HuntService.TotalCount - HuntService.FoundCount, 0)} restant(s)";
+		? "Tous les oeufs sont trouves"
+		: "Vers le tresor";
 
 	private double ProgressValue => HuntService.TotalCount == 0
 		? 0
@@ -283,11 +190,6 @@
 	private async Task RefreshAsync()
 	{
 		await HuntService.RefreshAsync();
-	}
-
-	private async Task ResetAsync()
-	{
-		await HuntService.ResetProgressAsync();
 	}
 
 	private async Task MarkCurrentTargetFoundAsync()
