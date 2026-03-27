@@ -232,7 +232,7 @@
 		{
 			await HuntService.LoadConfiguredTargetsAsync(configuredTargets, "Configuration organisateur");
 			await HuntService.StartAdventureAsync();
-			Navigation.NavigateTo("/hunt", replace: true);
+			Navigation.NavigateTo("hunt", replace: true);
 		}
 		catch (Exception exception)
 		{
