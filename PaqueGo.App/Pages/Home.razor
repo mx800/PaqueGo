@@ -1,7 +1,8 @@
 ﻿@page "/hunt"
-@implements IDisposable
+@implements IAsyncDisposable
 @inject EggHuntService HuntService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>Chasse aux trésors de Pâque</PageTitle>
 
@@ -258,6 +259,13 @@
 	private string? foundSequenceEggName;
 	private string? pendingFoundTargetId;
 	private string? runtimeMessage;
+	private bool audioStateDirty = true;
+	private bool disposed;
+	private int eggFoundSoundSequence;
+	private int lastPlayedEggFoundSoundSequence;
+	private HeatLevel? lastSyncedHeatLevel;
+	private bool? lastSearchAmbienceState;
+	private bool? lastFinalAmbienceState;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -282,19 +290,32 @@
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (!firstRender || !HuntService.HasTargets)
+		if (firstRender && HuntService.HasTargets)
+		{
+			await HuntService.ResumeSensorsAsync();
+			await HuntService.TryEnterFullscreenAsync();
+			await Task.Delay(1350);
+			showTransition = false;
+			audioStateDirty = true;
+			await InvokeAsync(StateHasChanged);
+		}
+
+		if (!HuntService.HasTargets)
 		{
 			return;
 		}
 
-		await HuntService.ResumeSensorsAsync();
-		await HuntService.TryEnterFullscreenAsync();
-		await Task.Delay(1350);
-		showTransition = false;
-		await InvokeAsync(StateHasChanged);
+		await SyncAudioStateAsync(firstRender);
 	}
 
 	private string DistanceLabel => HuntMath.ToFriendlyDistance(HuntService.DistanceToTargetMeters);
+
+	private bool IsSearchAmbienceActive =>
+		HuntService.AdventureStarted &&
+		HuntService.HasTargets &&
+		!showEggFoundSequence &&
+		!showFinalVictorySequence &&
+		!HuntService.IsCompleted;
 
 	private async Task PollAsync(CancellationToken cancellationToken)
 	{
@@ -320,7 +341,78 @@
 
 	private void HandleStateChanged()
 	{
+		audioStateDirty = true;
 		_ = InvokeAsync(StateHasChanged);
+	}
+
+	private async Task SyncAudioStateAsync(bool force = false)
+	{
+		if (disposed || !HuntService.HasTargets)
+		{
+			return;
+		}
+
+		var isSearchActive = IsSearchAmbienceActive;
+		var nextHeatLevel = isSearchActive ? HuntService.HeatLevel : HeatLevel.Unknown;
+		var isFinalActive = showFinalVictorySequence;
+		var shouldPlayEggFoundSound = showEggFoundSequence && lastPlayedEggFoundSoundSequence != eggFoundSoundSequence;
+
+		if (!force &&
+			!audioStateDirty &&
+			lastSearchAmbienceState == isSearchActive &&
+			lastSyncedHeatLevel == nextHeatLevel &&
+			lastFinalAmbienceState == isFinalActive &&
+			!shouldPlayEggFoundSound)
+		{
+			return;
+		}
+
+		try
+		{
+			await JS.InvokeVoidAsync("paqueGo.updateAudioState", new
+			{
+				isSearchActive,
+				heatLevel = nextHeatLevel.ToString(),
+				isFinalActive
+			});
+
+			if (shouldPlayEggFoundSound)
+			{
+				await JS.InvokeVoidAsync("paqueGo.playEggFound");
+				lastPlayedEggFoundSoundSequence = eggFoundSoundSequence;
+			}
+
+			lastSearchAmbienceState = isSearchActive;
+			lastSyncedHeatLevel = nextHeatLevel;
+			lastFinalAmbienceState = isFinalActive;
+			audioStateDirty = false;
+		}
+		catch (JSException)
+		{
+		}
+		catch (TaskCanceledException)
+		{
+		}
+		catch (ObjectDisposedException)
+		{
+		}
+	}
+
+	private async Task SafeStopAudioAsync()
+	{
+		try
+		{
+			await JS.InvokeVoidAsync("paqueGo.stopAllAudio");
+		}
+		catch (JSException)
+		{
+		}
+		catch (TaskCanceledException)
+		{
+		}
+		catch (ObjectDisposedException)
+		{
+		}
 	}
 
 	private async Task MarkCurrentTargetFoundAsync()
@@ -344,8 +436,10 @@
 			? "Une pluie doree attend ton signal pour lancer le final."
 			: "Le sentier magique se revele. Appuie pour faire apparaitre la prochaine piste.";
 
+		eggFoundSoundSequence++;
 		showEggFoundSequence = true;
 		isFindingEgg = true;
+		audioStateDirty = true;
 		await InvokeAsync(StateHasChanged);
 	}
 
@@ -377,6 +471,7 @@
 			foundSequenceEggName = null;
 			pendingFoundTargetId = null;
 			isPendingFinalEgg = false;
+			audioStateDirty = true;
 			await InvokeAsync(StateHasChanged);
 		}
 	}
@@ -400,6 +495,7 @@
 
 		showFinalVictorySequence = false;
 		isFindingEgg = false;
+		audioStateDirty = true;
 		await InvokeAsync(StateHasChanged);
 	}
 
@@ -407,6 +503,8 @@
 	{
 		try
 		{
+			await SafeStopAudioAsync();
+
 			showEggFoundSequence = false;
 			showFinalVictorySequence = false;
 			isFindingEgg = false;
@@ -415,6 +513,9 @@
 			foundSequenceEggName = null;
 			pendingFoundTargetId = null;
 			runtimeMessage = null;
+			lastPlayedEggFoundSoundSequence = 0;
+			eggFoundSoundSequence = 0;
+			audioStateDirty = true;
 
 			await HuntService.ResetProgressAsync();
 			Navigation.NavigateTo(string.Empty, replace: true);
@@ -426,11 +527,18 @@
 		}
 	}
 
-	public void Dispose()
+	public async ValueTask DisposeAsync()
 	{
+		if (disposed)
+		{
+			return;
+		}
+
+		disposed = true;
 		HuntService.StateChanged -= HandleStateChanged;
 		_refreshCts.Cancel();
 		_refreshTimer.Dispose();
 		_refreshCts.Dispose();
+		await SafeStopAudioAsync();
 	}
 }
