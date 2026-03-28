@@ -78,15 +78,13 @@ window.paqueGo = (() => {
         }
 
         // Also listen to regular deviceorientation for iOS (webkitCompassHeading)
-        // and as fallback when absolute events report absolute === true.
+        // and as a general fallback. Priority: deviceorientationabsolute > this.
         orientationHandler = (event) => {
             if (hasAbsoluteOrientation) {
                 return;
             }
 
-            if (typeof event.webkitCompassHeading === "number" || event.absolute === true) {
-                applyOrientationEvent(event);
-            }
+            applyOrientationEvent(event);
         };
         window.addEventListener("deviceorientation", orientationHandler, true);
     };

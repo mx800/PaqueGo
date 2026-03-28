@@ -562,7 +562,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
         BearingToTargetDegrees = HuntMath.CalculateBearingDegrees(currentLatitude, currentLongitude, ActiveTarget.Latitude, ActiveTarget.Longitude);
         RelativeBearingDegrees = Snapshot.IsHeadingAvailable && Snapshot.HeadingDegrees is double headingDegrees
             ? HuntMath.CalculateRelativeBearingDegrees(BearingToTargetDegrees.Value, headingDegrees)
-            : null;
+            : BearingToTargetDegrees;
     }
 
     private string BuildPlayerMessage()
