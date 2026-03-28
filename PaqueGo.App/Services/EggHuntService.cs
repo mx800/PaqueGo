@@ -25,9 +25,6 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
     private IReadOnlyList<EggTarget> targets = Array.Empty<EggTarget>();
     private string currentSourceKey = "sample";
     private bool initialized;
-    private DotNetObjectReference<EggHuntService>? selfReference;
-    private double? liveHeadingDegrees;
-    private bool isLiveHeadingAvailable;
 
     /// <summary>
     /// Raised whenever the hunt state changes.
@@ -174,7 +171,6 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
         {
             await jsRuntime.InvokeAsync<bool>("paqueGo.requestMotionPermission");
             await jsRuntime.InvokeVoidAsync("paqueGo.startSensors");
-            await RegisterHeadingCallbackAsync();
         }
         catch (JSException)
         {
@@ -194,7 +190,6 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
         try
         {
             await jsRuntime.InvokeVoidAsync("paqueGo.startSensors");
-            await RegisterHeadingCallbackAsync();
         }
         catch (JSException)
         {
@@ -221,6 +216,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
         }
 
         RecomputeDerivedState();
+        await PushBearingToJsAsync();
         NotifyStateChanged();
     }
 
@@ -356,29 +352,13 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
         catch (JSException)
         {
         }
-
-        selfReference?.Dispose();
     }
 
-    /// <summary>
-    /// Called from JavaScript when the device heading changes.
-    /// </summary>
-    /// <param name="headingDegrees">The new heading in degrees from north.</param>
-    [JSInvokable]
-    public void OnHeadingChanged(double headingDegrees)
-    {
-        liveHeadingDegrees = headingDegrees;
-        isLiveHeadingAvailable = true;
-        RecomputeDerivedState();
-        NotifyStateChanged();
-    }
-
-    private async Task RegisterHeadingCallbackAsync()
+    private async Task PushBearingToJsAsync()
     {
         try
         {
-            selfReference ??= DotNetObjectReference.Create(this);
-            await jsRuntime.InvokeVoidAsync("paqueGo.registerHeadingCallback", selfReference);
+            await jsRuntime.InvokeVoidAsync("paqueGo.setTargetBearing", BearingToTargetDegrees);
         }
         catch (JSException)
         {
@@ -592,15 +572,8 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
 
         DistanceToTargetMeters = HuntMath.CalculateDistanceMeters(currentLatitude, currentLongitude, ActiveTarget.Latitude, ActiveTarget.Longitude);
         BearingToTargetDegrees = HuntMath.CalculateBearingDegrees(currentLatitude, currentLongitude, ActiveTarget.Latitude, ActiveTarget.Longitude);
-
-        var hasHeading = isLiveHeadingAvailable
-            || (Snapshot.IsHeadingAvailable && Snapshot.HeadingDegrees is not null);
-        var headingValue = isLiveHeadingAvailable
-            ? liveHeadingDegrees!.Value
-            : Snapshot.HeadingDegrees ?? 0d;
-
-        RelativeBearingDegrees = hasHeading
-            ? HuntMath.CalculateRelativeBearingDegrees(BearingToTargetDegrees.Value, headingValue)
+        RelativeBearingDegrees = Snapshot.IsHeadingAvailable && Snapshot.HeadingDegrees is double headingDegrees
+            ? HuntMath.CalculateRelativeBearingDegrees(BearingToTargetDegrees.Value, headingDegrees)
             : BearingToTargetDegrees;
     }
 

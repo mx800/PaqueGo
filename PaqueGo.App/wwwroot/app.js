@@ -17,27 +17,37 @@ window.paqueGo = (() => {
     let absoluteOrientationHandler = null;
     let hasOrientationHeading = false;
     let hasAbsoluteOrientation = false;
-    let dotNetHeadingRef = null;
-    let lastHeadingPushTime = 0;
+    let bearingToTarget = null;
 
     const normalizeDegrees = (degrees) => {
         const normalized = degrees % 360;
         return normalized < 0 ? normalized + 360 : normalized;
     };
 
-    const pushHeadingToDotNet = () => {
-        if (!dotNetHeadingRef || !state.isHeadingAvailable || state.headingDegrees === null) {
+    const updateCompassNeedle = () => {
+        const el = document.getElementById("compass-pointer");
+
+        if (!el || bearingToTarget === null) {
             return;
         }
 
-        const now = performance.now();
+        let rotation;
 
-        if (now - lastHeadingPushTime < 100) {
-            return;
+        if (state.isHeadingAvailable && state.headingDegrees !== null) {
+            let delta = (bearingToTarget - state.headingDegrees) % 360;
+
+            if (delta < 0) {
+                delta += 360;
+            }
+
+            rotation = delta > 180 ? delta - 360 : delta;
+            el.classList.add("is-live");
+        } else {
+            rotation = bearingToTarget;
+            el.classList.remove("is-live");
         }
 
-        lastHeadingPushTime = now;
-        dotNetHeadingRef.invokeMethodAsync("OnHeadingChanged", state.headingDegrees);
+        el.style.transform = `rotate(${rotation.toFixed(1)}deg)`;
     };
 
     const setHeading = (heading, source) => {
@@ -65,7 +75,7 @@ window.paqueGo = (() => {
             state.orientationError = null;
         }
 
-        pushHeadingToDotNet();
+        updateCompassNeedle();
         return true;
     };
 
@@ -155,7 +165,7 @@ window.paqueGo = (() => {
             orientationHandler = null;
         }
 
-        dotNetHeadingRef = null;
+        bearingToTarget = null;
     };
 
     const requestMotionPermission = async () => {
@@ -189,8 +199,9 @@ window.paqueGo = (() => {
         ensureOrientationListener();
     };
 
-    const registerHeadingCallback = (ref) => {
-        dotNetHeadingRef = ref;
+    const setTargetBearing = (bearing) => {
+        bearingToTarget = (typeof bearing === "number" && !Number.isNaN(bearing)) ? bearing : null;
+        updateCompassNeedle();
     };
 
     const getSensorSnapshot = () => ({ ...state });
@@ -222,7 +233,7 @@ window.paqueGo = (() => {
     return {
         getDisplayState,
         getSensorSnapshot,
-        registerHeadingCallback,
+        setTargetBearing,
         localStorageGet,
         localStorageRemove,
         localStorageSet,
