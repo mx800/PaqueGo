@@ -60,7 +60,7 @@
 
 				<div class="builder-form">
 					<MudGrid Class="form-grid">
-						<MudItem xs="12" md="6">
+						<MudItem xs="12" md="0">
 						<label class="form-field">
 							<span class="metric-label">Nom du point</span>
 							<MudTextField @bind-Value="pointName"
@@ -72,7 +72,7 @@
 						</label>
 						</MudItem>
 
-						<MudItem xs="12" md="6">
+						<MudItem xs="12" md="0">
 						<label class="form-field">
 							<span class="metric-label">Indice</span>
 							<MudTextField @bind-Value="pointHint"
@@ -84,7 +84,7 @@
 						</label>
 						</MudItem>
 
-						<MudItem xs="12" md="6">
+						<MudItem xs="12" md="0">
 						<label class="form-field">
 							<span class="metric-label">Latitude</span>
 							<MudNumericField T="double?"
@@ -99,7 +99,7 @@
 						</label>
 						</MudItem>
 
-						<MudItem xs="12" md="6">
+						<MudItem xs="12" md="0">
 						<label class="form-field">
 							<span class="metric-label">Longitude</span>
 							<MudNumericField T="double?"
@@ -266,7 +266,7 @@
 		{
 			await HuntService.LoadConfiguredTargetsAsync(configuredTargets, "Configuration organisateur");
 			await HuntService.StartAdventureAsync();
-			Navigation.NavigateTo("hunt", replace: true);
+			Navigation.NavigateTo("hunt");
 		}
 		catch (Exception exception)
 		{
