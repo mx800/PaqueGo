@@ -68,7 +68,7 @@ window.paqueGo = (() => {
             },
             (error) => {
                 state.isLocationAvailable = false;
-                state.geolocationError = error.message || "Impossible de lire la position du telephone.";
+                state.geolocationError = error.message || "Impossible de lire la position du téléphone.";
             },
             {
                 enableHighAccuracy: true,
@@ -101,7 +101,7 @@ window.paqueGo = (() => {
         try {
             const result = await DeviceOrientationEvent.requestPermission();
             state.motionPermissionGranted = result === "granted";
-            state.orientationError = state.motionPermissionGranted ? null : "Autorise la boussole pour profiter de la fleche magique.";
+            state.orientationError = state.motionPermissionGranted ? null : "Autorise la boussole pour profiter de la flèche magique.";
 
             if (state.motionPermissionGranted) {
                 ensureOrientationListener();
@@ -110,7 +110,7 @@ window.paqueGo = (() => {
             return state.motionPermissionGranted;
         } catch (error) {
             state.motionPermissionGranted = false;
-            state.orientationError = error?.message || "La boussole n'a pas ete autorisee.";
+            state.orientationError = error?.message || "La boussole n'a pas été autorisée.";
             return false;
         }
     };

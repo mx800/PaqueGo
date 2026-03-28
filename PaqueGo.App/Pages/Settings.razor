@@ -15,28 +15,19 @@
 	</div>
 
 	<section class="settings-shell">
-		<RadzenCard class="settings-hero">
+		<MudPaper Class="settings-hero hero-card mud-shell-card" Elevation="0">
 			<div class="hero-copy">
-				<div class="eyebrow">Organisation de la chasse</div>
 				<h1>Chasse aux trésors de Pâque</h1>
-				<p class="hero-text">Prepare les points de passage, compose les indices et lance l'aventure quand tout est pret.</p>
-
-				<div class="settings-actions">
-					<RadzenButton Text="Commencer la chasse"
-							  Icon="play_circle"
-							  Click="@StartHuntAsync"
-							  Disabled="@(configuredTargets.Count == 0)"
-							  class="cta-button" />
-					<RadzenButton Text="Effacer les points"
-							  Icon="delete_sweep"
-							  ButtonStyle="ButtonStyle.Light"
-							  Variant="Variant.Flat"
-							  Click="@ClearPointsAsync" />
-				</div>
+				<MudText Typo="Typo.body1" Class="hero-text">Prépare les points de passage, compose les indices et lance l'aventure quand tout est prêt.</MudText>
 
 				@if (!string.IsNullOrWhiteSpace(pageMessage))
 				{
-					<div class="upload-message @(pageMessageIsError ? "is-error" : "is-success")">@pageMessage</div>
+					<MudAlert Severity="@(pageMessageIsError ? Severity.Error : Severity.Success)"
+							  Variant="Variant.Filled"
+							  Dense="true"
+							  Class="@($"upload-message mud-message {(pageMessageIsError ? "is-error" : "is-success")}")">
+						@pageMessage
+					</MudAlert>
 				}
 			</div>
 
@@ -56,89 +47,140 @@
 				<div class="floating-egg egg-b"></div>
 				<div class="floating-egg egg-c"></div>
 			</div>
-		</RadzenCard>
+		</MudPaper>
 
-		<div class="settings-grid">
-			<RadzenCard class="game-card settings-builder-card">
+		<MudGrid>
+			<MudItem xs="12" sm="6">
+				<MudPaper Class="game-card settings-builder-card mud-shell-card" Elevation="0">
 				<div class="card-head compact">
 					<div>
-						<div class="section-label">Page principale</div>
-						<h2>Configurer les points</h2>
+						<h2>Enregistrement des points</h2>
 					</div>
-					<div class="target-chip">@configuredTargets.Count point(s)</div>
 				</div>
 
 				<div class="builder-form">
-					<div class="form-grid">
+					<MudGrid Class="form-grid">
+						<MudItem xs="12" md="6">
 						<label class="form-field">
 							<span class="metric-label">Nom du point</span>
-							<RadzenTextBox @bind-Value="pointName" Placeholder="Ex. Oeuf dore" Style="width: 100%;" />
+							<MudTextField @bind-Value="pointName"
+									  Placeholder="Ex. Oeuf doré"
+									  Variant="Variant.Outlined"
+									  Margin="Margin.Dense"
+									  Immediate="true"
+									  Class="mud-input-elevated" />
 						</label>
+						</MudItem>
 
+						<MudItem xs="12" md="6">
 						<label class="form-field">
 							<span class="metric-label">Indice</span>
-							<RadzenTextBox @bind-Value="pointHint" Placeholder="Ex. Pres du banc" Style="width: 100%;" />
+							<MudTextField @bind-Value="pointHint"
+									  Placeholder="Ex. Près du banc"
+									  Variant="Variant.Outlined"
+									  Margin="Margin.Dense"
+									  Immediate="true"
+									  Class="mud-input-elevated" />
 						</label>
+						</MudItem>
 
+						<MudItem xs="12" md="6">
 						<label class="form-field">
 							<span class="metric-label">Latitude</span>
-							<RadzenNumeric @bind-Value="pointLatitude" TValue="double?" Step="0.000001" Format="0.000000" Style="width: 100%;" />
+							<MudNumericField T="double?"
+										 @bind-Value="pointLatitude"
+										 Step="0.000001"
+										 Format="0.000000"
+										 Variant="Variant.Outlined"
+										 Margin="Margin.Dense"
+										 Immediate="true"
+										 HideSpinButtons="true"
+										 Class="mud-input-elevated" />
 						</label>
+						</MudItem>
 
+						<MudItem xs="12" md="6">
 						<label class="form-field">
 							<span class="metric-label">Longitude</span>
-							<RadzenNumeric @bind-Value="pointLongitude" TValue="double?" Step="0.000001" Format="0.000000" Style="width: 100%;" />
+							<MudNumericField T="double?"
+										 @bind-Value="pointLongitude"
+										 Step="0.000001"
+										 Format="0.000000"
+										 Variant="Variant.Outlined"
+										 Margin="Margin.Dense"
+										 Immediate="true"
+										 HideSpinButtons="true"
+										 Class="mud-input-elevated" />
 						</label>
-					</div>
+						</MudItem>
+					</MudGrid>
 
-					<RadzenButton Text="Ajouter un point"
-							  Icon="add_location_alt"
-							  Click="@AddPoint"
-							  Disabled="@(!CanAddPoint)"
-							  class="success-button builder-add-button" />
+					<MudButton Variant="Variant.Filled"
+							   Color="Color.Success"
+							   StartIcon="@Icons.Material.Filled.Add"
+							   OnClick="@AddPoint"
+							   Disabled="@(!CanAddPoint)"
+							   Class="success-button builder-add-button">
+						Ajouter un point
+					</MudButton>
 				</div>
-			</RadzenCard>
+				</MudPaper>
+			</MudItem>
 
-			<RadzenCard class="game-card settings-points-card">
+			<MudItem xs="12" sm="6">
+				<MudPaper Class="game-card settings-points-card mud-shell-card" Elevation="0">
 				<div class="card-head compact">
 					<div>
-						<div class="section-label">Liste de la chasse</div>
-						<h2>Points enregistres</h2>
+						<h2>Points enregistrés</h2>
 					</div>
-					<div class="progress-badge">Prêt à jouer</div>
+					<MudChip T="string" Class="target-chip" Color="Color.Primary" Variant="Variant.Filled">@configuredTargets.Count point(s)</MudChip>
 				</div>
 
 				@if (configuredTargets.Count == 0)
 				{
-					<div class="empty-state-card">
-						<strong>Ajoute ton premier point</strong>
-						<span>Chaque point a besoin d'un nom, d'une latitude et d'une longitude.</span>
-					</div>
+					<MudPaper Class="empty-state-card" Elevation="0">
+						<MudText Typo="Typo.h6">Ajoute ton premier point</MudText>
+						<MudText Typo="Typo.body2">Chaque point a besoin d'un nom, d'une latitude et d'une longitude.</MudText>
+					</MudPaper>
 				}
 				else
 				{
 					<div class="point-list">
 						@foreach (var target in configuredTargets)
 						{
-							<div class="point-item">
+							<MudPaper Class="point-item" Elevation="0">
 								<div class="point-copy">
-									<strong>@target.Name</strong>
-									<span>@target.Latitude.ToString("0.000000"), @target.Longitude.ToString("0.000000")</span>
+									<MudText Typo="Typo.h6">@target.Name</MudText>
+									<MudText Typo="Typo.body2">@target.Latitude.ToString("0.000000"), @target.Longitude.ToString("0.000000")</MudText>
 									@if (!string.IsNullOrWhiteSpace(target.Hint))
 									{
-										<em>Indice : @target.Hint</em>
+										<MudText Typo="Typo.body2"><em>Indice : @target.Hint</em></MudText>
 									}
 								</div>
-								<RadzenButton Icon="delete"
-										  ButtonStyle="ButtonStyle.Light"
-										  Variant="Variant.Flat"
-										  Click="@(() => RemovePoint(target.Id))" />
-							</div>
+								<MudIconButton Icon="@Icons.Material.Filled.Delete"
+										   Color="Color.Error"
+										   Size="Size.Medium"
+										   OnClick="@(() => RemovePoint(target.Id))" />
+							</MudPaper>
 						}
 					</div>
 				}
-			</RadzenCard>
-		</div>
+
+				@if (configuredTargets.Count > 0)
+				{
+					<div class="points-panel-actions">
+						<MudButton Variant="Variant.Filled"
+								   Color="Color.Primary"
+								   StartIcon="@Icons.Material.Filled.Explore"
+								   OnClick="@StartHuntAsync"
+								   Class="cta-button points-start-button">
+							Commencer la chasse
+						</MudButton>
+					</div>
+				}
+				</MudPaper>
+			</MudItem>
+		</MudGrid>
 	</section>
 </div>
 
@@ -174,7 +216,7 @@
 		catch (Exception exception)
 		{
 			pageMessageIsError = true;
-			pageMessage = $"La configuration n'a pas pu etre chargee : {exception.Message}";
+			pageMessage = $"La configuration n'a pas pu être chargée : {exception.Message}";
 		}
 	}
 
@@ -201,7 +243,7 @@
 		pointLatitude = null;
 		pointLongitude = null;
 		pageMessageIsError = false;
-		pageMessage = "Le point a ete ajoute a la chasse.";
+		pageMessage = "Le point a été ajouté à la chasse.";
 	}
 
 	private void RemovePoint(string pointId)
@@ -214,14 +256,6 @@
 		}
 
 		configuredTargets.RemoveAt(index);
-		pageMessage = null;
-		pageMessageIsError = false;
-	}
-
-	private async Task ClearPointsAsync()
-	{
-		configuredTargets.Clear();
-		await HuntService.ClearConfiguredTargetsAsync();
 		pageMessage = null;
 		pageMessageIsError = false;
 	}

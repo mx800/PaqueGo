@@ -1,14 +1,14 @@
-<div class="heat-indicator heat-@Level.ToString().ToLowerInvariant()">
+<MudPaper Class="@($"heat-indicator heat-{Level.ToString().ToLowerInvariant()}")" Elevation="0">
     <div class="heat-lights" aria-hidden="true">
         <span class="heat-light @(Level == HeatLevel.Cold ? "active" : string.Empty)"></span>
         <span class="heat-light @(Level == HeatLevel.Warm ? "active" : string.Empty)"></span>
         <span class="heat-light @(Level == HeatLevel.Hot ? "active" : string.Empty)"></span>
     </div>
     <div class="heat-copy">
-        <strong>@Title</strong>
-        <span>@Subtitle</span>
+        <MudText Typo="Typo.h6">@Title</MudText>
+        <MudText Typo="Typo.body2">@Subtitle</MudText>
     </div>
-</div>
+</MudPaper>
 
 @code {
     [Parameter]
@@ -20,16 +20,16 @@
     private string Title => Level switch
     {
         HeatLevel.Hot => "Chaud",
-        HeatLevel.Warm => "Tiede",
+        HeatLevel.Warm => "Tiède",
         HeatLevel.Cold => "Froid",
         _ => "Recherche"
     };
 
     private string Subtitle => Level switch
     {
-        HeatLevel.Hot => "Moins de 5 metres. Regarde partout autour de toi !",
-        HeatLevel.Warm => "Tu arrives bientot.",
-        HeatLevel.Cold => "Continue d'avancer vers le tresor.",
-        _ => "Bouge un peu pour reveiller la boussole."
+        HeatLevel.Hot => "Chaud quand tu es à moins de 5 mètres.",
+        HeatLevel.Warm => "Tiède quand tu es à moins de 10 mètres.",
+        HeatLevel.Cold => "Froid quand tu es à plus de 10 mètres.",
+        _ => "Bouge un peu pour réveiller la boussole."
     };
 }

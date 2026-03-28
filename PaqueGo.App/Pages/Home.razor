@@ -44,7 +44,7 @@
 			<div class="transition-card">
 				<div class="transition-ribbon">La chasse commence</div>
 				<h1>Chasse aux trésors de Pâque</h1>
-				<p>Les oeufs scintillent, la boussole s'eveille et le jardin se transforme en terrain d'aventure.</p>
+				<p>Les oeufs scintillent, la boussole s'éveille et le jardin se transforme en terrain d'aventure.</p>
 				<div class="transition-eggs">
 					<span class="transition-egg egg-one"></span>
 					<span class="transition-egg egg-two"></span>
@@ -55,23 +55,27 @@
 	}
 
 	<section class="play-stage">
-		<div class="play-header hero-card">
-			<div class="hero-copy">
-				<h1>@HeroTitle</h1>
-				@if (!string.IsNullOrWhiteSpace(runtimeMessage))
-				{
-					<div class="upload-message is-error">@runtimeMessage</div>
-				}
-			</div>
-		</div>
-
 		<section class="play-layout">
-			<RadzenCard class="game-card compass-card immersive-compass-card">
-				<div class="card-head compact">
-					<div>
-						<div class="section-label">Direction</div>
-						<h2>@CompassTitle</h2>
-					</div>
+			<MudPaper Class="game-card compass-card immersive-compass-card mud-shell-card" Elevation="0">
+				<div class="hunt-panel-copy">
+					<h1>La boussole te guide vers le trésor</h1>
+					@if (!string.IsNullOrWhiteSpace(runtimeMessage))
+					{
+						<MudAlert Severity="Severity.Error"
+								  Variant="Variant.Filled"
+								  Dense="true"
+								  Class="upload-message mud-message is-error">
+							@runtimeMessage
+						</MudAlert>
+					}
+
+					@if (HuntService.ActiveTarget is not null)
+					{
+						<div class="active-target-label">
+							<MudText Typo="Typo.overline" Class="section-label mud-overline">Point actuel</MudText>
+							<MudText Typo="Typo.h5">@HuntService.ActiveTarget.Name</MudText>
+						</div>
+					}
 				</div>
 
 			<CompassDisplay RelativeBearingDegrees="@HuntService.RelativeBearingDegrees"
@@ -80,40 +84,42 @@
 							IsLive="@HuntService.Snapshot.IsHeadingAvailable"
 							TargetName="@HuntService.ActiveTarget?.Name" />
 
+				<div class="distance-panel">
+					<MudText Typo="Typo.overline" Class="section-label mud-overline">Distance à parcourir</MudText>
+					<MudText Typo="Typo.h4" Class="distance-value">@DistanceLabel</MudText>
+				</div>
+
 			<HeatIndicator Level="@HuntService.HeatLevel" DistanceMeters="@HuntService.DistanceToTargetMeters" />
 
 				@if (!string.IsNullOrWhiteSpace(HuntService.ActiveTarget?.Hint))
 				{
-					<div class="hint-bubble">Indice : @HuntService.ActiveTarget.Hint</div>
+					<MudChip T="string" Class="hint-bubble hint-pill" Color="Color.Warning" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Info">
+						Indice : @HuntService.ActiveTarget.Hint
+					</MudChip>
 				}
 
-				<RadzenProgressBar Value="@ProgressValue"
-								   Min="0"
-								   Max="100"
-								   ShowValue="false"
-								   class="hunt-progress" />
-
 				<div class="compass-footer-actions">
-					<RadzenButton Text="Oeuf trouve !"
-								  Icon="egg_alt"
-								  Click="@MarkCurrentTargetFoundAsync"
-								  Disabled="@(HuntService.ActiveTarget is null)"
-								  class="success-button compass-primary-action" />
-					<RadzenButton Text="Actualiser"
-								  Icon="explore"
-								  ButtonStyle="ButtonStyle.Secondary"
-								  Variant="Variant.Flat"
-								  Click="@RefreshAsync" />
+					<MudButton Variant="Variant.Filled"
+							   Color="Color.Success"
+							   StartIcon="@Icons.Material.Filled.CheckCircle"
+							   OnClick="@MarkCurrentTargetFoundAsync"
+							   Disabled="@(HuntService.ActiveTarget is null)"
+							   Class="success-button compass-primary-action">
+						Oeuf trouvé !
+					</MudButton>
 				</div>
 
 				@if (HuntService.IsCompleted)
 				{
-					<div class="celebration-box">
-						<h3>Bravo, tous les oeufs sont trouves !</h3>
-						<p>Le lapin de Paques saute de joie.</p>
-					</div>
+					<MudAlert Severity="Severity.Success"
+							  Variant="Variant.Filled"
+							  Dense="true"
+							  Class="celebration-box">
+						<MudText Typo="Typo.h6">Bravo, tous les oeufs sont trouvés !</MudText>
+						<MudText Typo="Typo.body2">Le lapin de Pâque saute de joie.</MudText>
+					</MudAlert>
 				}
-			</RadzenCard>
+			</MudPaper>
 	</section>
 	</section>
 
@@ -153,7 +159,7 @@
 		}
 		catch (Exception exception)
 		{
-			runtimeMessage = $"L'application n'a pas pu demarrer correctement : {exception.Message}";
+			runtimeMessage = $"L'application n'a pas pu démarrer correctement : {exception.Message}";
 		}
 	}
 
@@ -171,17 +177,7 @@
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private string HeroTitle => HuntService.IsCompleted
-		? "Mission arc-en-ciel terminee !"
-		: "La boussole te guide vers le prochain tresor";
-
-	private string CompassTitle => HuntService.IsCompleted
-		? "Tous les oeufs sont trouves"
-		: "Vers le tresor";
-
-	private double ProgressValue => HuntService.TotalCount == 0
-		? 0
-		: HuntService.FoundCount * 100d / HuntService.TotalCount;
+	private string DistanceLabel => HuntMath.ToFriendlyDistance(HuntService.DistanceToTargetMeters);
 
 	private async Task PollAsync(CancellationToken cancellationToken)
 	{
@@ -200,7 +196,7 @@
 		}
 		catch (Exception exception)
 		{
-			runtimeMessage = $"Le rafraichissement automatique a ete interrompu : {exception.Message}";
+			runtimeMessage = $"Le rafraîchissement automatique a été interrompu : {exception.Message}";
 			await InvokeAsync(StateHasChanged);
 		}
 	}
@@ -208,11 +204,6 @@
 	private void HandleStateChanged()
 	{
 		_ = InvokeAsync(StateHasChanged);
-	}
-
-	private async Task RefreshAsync()
-	{
-		await HuntService.RefreshAsync();
 	}
 
 	private async Task MarkCurrentTargetFoundAsync()

@@ -84,7 +84,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
     /// <summary>
     /// Gets the current data source label.
     /// </summary>
-    public string DataSourceLabel { get; private set; } = "Aucune chasse configuree";
+    public string DataSourceLabel { get; private set; } = "Aucune chasse configurée";
 
     /// <summary>
     /// Gets the number of found eggs.
@@ -112,7 +112,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
     public string HeatLevelLabel => HeatLevel switch
     {
         HeatLevel.Hot => "Chaud",
-        HeatLevel.Warm => "Tiede",
+        HeatLevel.Warm => "Tiède",
         HeatLevel.Cold => "Froid",
         _ => "En attente"
     };
@@ -290,7 +290,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
     public async Task LoadSampleTargetsAsync()
     {
         var sampleJson = await httpClient.GetStringAsync(SampleDataPath);
-        ApplyTargets(sampleJson, "Exemple integre", true);
+        ApplyTargets(sampleJson, "Exemple intégré", true);
         await RemoveStorageKeyAsync(CustomTargetsStorageKey);
         await PersistProgressAsync();
         NotifyStateChanged();
@@ -358,7 +358,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
 
         if (source.ValueKind != JsonValueKind.Array)
         {
-            throw new InvalidOperationException("Le JSON doit contenir une liste d'objets ou une propriete eggs/points.");
+            throw new InvalidOperationException("Le JSON doit contenir une liste d'objets ou une propriété eggs/points.");
         }
 
         var result = new List<EggTarget>();
@@ -430,7 +430,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
             }
         }
 
-        throw new InvalidOperationException($"La propriete {propertyNames[0]} est manquante ou invalide.");
+        throw new InvalidOperationException($"La propriété {propertyNames[0]} est manquante ou invalide.");
     }
 
     private static bool TryGetPropertyIgnoreCase(JsonElement element, string propertyName, out JsonElement propertyValue)
@@ -559,7 +559,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
 
         if (IsCompleted)
         {
-            return "Tous les oeufs sont trouves. Le panier est complet !";
+            return "Tous les oeufs sont trouvés. Le panier est complet !";
         }
 
         if (!AdventureStarted)
@@ -571,14 +571,14 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
         {
             return !string.IsNullOrWhiteSpace(Snapshot.GeolocationError)
                 ? Snapshot.GeolocationError!
-                : "Active la localisation pour que la boussole sache ou tu es.";
+                : "Active la localisation pour que la boussole sache où tu es.";
         }
 
         return HeatLevel switch
         {
-            HeatLevel.Hot => "Chaud ! L'oeuf est juste a cote de toi.",
-            HeatLevel.Warm => "Tiede ! Continue dans cette direction.",
-            HeatLevel.Cold => "Froid, avance encore vers la fleche.",
+            HeatLevel.Hot => "Chaud ! L'oeuf est juste à côté de toi.",
+            HeatLevel.Warm => "Tiède ! Continue dans cette direction.",
+            HeatLevel.Cold => "Froid, avance encore vers la flèche.",
             _ => "La boussole cherche encore le meilleur chemin."
         };
     }
@@ -598,7 +598,7 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
     private void ClearTargets()
     {
         targets = Array.Empty<EggTarget>();
-        DataSourceLabel = "Aucune chasse configuree";
+        DataSourceLabel = "Aucune chasse configurée";
         IsUsingSampleData = false;
         currentSourceKey = "empty";
         foundTargetIds.Clear();

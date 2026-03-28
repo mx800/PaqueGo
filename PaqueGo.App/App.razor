@@ -1,4 +1,6 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@inject NavigationManager Navigation
+
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -6,11 +8,24 @@
     <NotFound>
         <PageTitle>PaqueGo</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <div class="not-found-card" role="alert">
+            <MudPaper Class="not-found-card mud-shell-card" Elevation="0" role="alert">
                 <h1>Oups, ce sentier n'existe pas.</h1>
-                <p>Retourne a l'accueil pour reprendre la chasse aux oeufs.</p>
-                <RadzenButton Text="Retour a la chasse" Path="" Icon="home" />
-            </div>
+                <MudText Typo="Typo.body1">Retourne à l'accueil pour reprendre la chasse aux oeufs.</MudText>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Home"
+                           OnClick="@GoHome"
+                           Class="cta-button">
+                    Retour a la chasse
+                </MudButton>
+            </MudPaper>
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

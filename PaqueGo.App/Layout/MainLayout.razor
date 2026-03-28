@@ -1,9 +1,41 @@
 ﻿@inherits LayoutComponentBase
-<RadzenDialog />
-<RadzenNotification />
-<RadzenTooltip />
-<RadzenContextMenu />
 
-<div class="app-frame">
-    @Body
-</div>
+<MudThemeProvider Theme="@Theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout Class="app-shell">
+    <MudMainContent Class="app-main">
+        <div class="app-frame">
+            @Body
+        </div>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private MudTheme Theme { get; } = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#ff8fb4",
+            Secondary = "#ffd86b",
+            Info = "#92d6ff",
+            Success = "#9ee8c4",
+            Warning = "#ffd86b",
+            Error = "#ff9e7a",
+            Background = "#fffaf0",
+            Surface = "rgba(255, 255, 255, 0.88)",
+            AppbarBackground = "rgba(255, 255, 255, 0.74)",
+            AppbarText = "#5b4b58",
+            TextPrimary = "#5b4b58",
+            TextSecondary = "#8e7482",
+            LinesDefault = "rgba(255, 255, 255, 0.68)",
+            ActionDefault = "#8e7482"
+        },
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "24px"
+        }
+    };
+}

@@ -14,9 +14,9 @@
             <span class="pointer-tail"></span>
         </div>
         <div class="compass-core">
-            <span class="compass-target">@(TargetName ?? "En attente")</span>
-            <span class="compass-distance">@DistanceLabel</span>
-            <span class="compass-subtitle">@(IsLive ? "Suis la fleche vers le tresor" : "La cible apparait des que la direction est disponible")</span>
+            <MudText Typo="Typo.overline" Class="compass-target">@(TargetName ?? "En attente")</MudText>
+            <MudText Typo="Typo.h4" Class="compass-distance">@DistanceLabel</MudText>
+            <MudText Typo="Typo.body2" Class="compass-subtitle">@(IsLive ? "Suis la flèche vers le trésor" : "La cible apparaît dès que la direction est disponible")</MudText>
         </div>
     </div>
 </div>
