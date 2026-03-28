@@ -17,10 +17,27 @@ window.paqueGo = (() => {
     let absoluteOrientationHandler = null;
     let hasOrientationHeading = false;
     let hasAbsoluteOrientation = false;
+    let dotNetHeadingRef = null;
+    let lastHeadingPushTime = 0;
 
     const normalizeDegrees = (degrees) => {
         const normalized = degrees % 360;
         return normalized < 0 ? normalized + 360 : normalized;
+    };
+
+    const pushHeadingToDotNet = () => {
+        if (!dotNetHeadingRef || !state.isHeadingAvailable || state.headingDegrees === null) {
+            return;
+        }
+
+        const now = performance.now();
+
+        if (now - lastHeadingPushTime < 100) {
+            return;
+        }
+
+        lastHeadingPushTime = now;
+        dotNetHeadingRef.invokeMethodAsync("OnHeadingChanged", state.headingDegrees);
     };
 
     const setHeading = (heading, source) => {
@@ -48,6 +65,7 @@ window.paqueGo = (() => {
             state.orientationError = null;
         }
 
+        pushHeadingToDotNet();
         return true;
     };
 
@@ -60,7 +78,7 @@ window.paqueGo = (() => {
             heading = normalizeDegrees(360 - event.alpha);
         }
 
-        setHeading(heading, "orientation");
+        return setHeading(heading, "orientation");
     };
 
     const ensureOrientationListener = () => {
@@ -71,8 +89,9 @@ window.paqueGo = (() => {
         // Prefer deviceorientationabsolute (Android/Chrome) where alpha is referenced to magnetic north.
         if ("ondeviceorientationabsolute" in window) {
             absoluteOrientationHandler = (event) => {
-                hasAbsoluteOrientation = true;
-                applyOrientationEvent(event);
+                if (applyOrientationEvent(event)) {
+                    hasAbsoluteOrientation = true;
+                }
             };
             window.addEventListener("deviceorientationabsolute", absoluteOrientationHandler, true);
         }
@@ -135,6 +154,8 @@ window.paqueGo = (() => {
             window.removeEventListener("deviceorientation", orientationHandler, true);
             orientationHandler = null;
         }
+
+        dotNetHeadingRef = null;
     };
 
     const requestMotionPermission = async () => {
@@ -168,6 +189,10 @@ window.paqueGo = (() => {
         ensureOrientationListener();
     };
 
+    const registerHeadingCallback = (ref) => {
+        dotNetHeadingRef = ref;
+    };
+
     const getSensorSnapshot = () => ({ ...state });
 
     const getDisplayState = () => {
@@ -197,6 +222,7 @@ window.paqueGo = (() => {
     return {
         getDisplayState,
         getSensorSnapshot,
+        registerHeadingCallback,
         localStorageGet,
         localStorageRemove,
         localStorageSet,
