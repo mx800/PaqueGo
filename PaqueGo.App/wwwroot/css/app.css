@@ -4,6 +4,9 @@
     --sky-bottom: #fff6d9;
     --sun-glow: rgba(255, 234, 160, 0.78);
     --pink-haze: rgba(255, 168, 198, 0.28);
+    --pink-flare: rgba(255, 143, 180, 0.38);
+    --blue-flare: rgba(146, 214, 255, 0.34);
+    --mint-flare: rgba(158, 232, 196, 0.34);
     --panel: rgba(255, 255, 255, 0.82);
     --panel-strong: rgba(255, 255, 255, 0.94);
     --ink: #5b4b58;
@@ -42,6 +45,21 @@ body {
     min-height: 100dvh;
 }
 
+body::before {
+    content: "";
+    position: fixed;
+    inset: -12%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 18%),
+        radial-gradient(circle at 78% 12%, var(--pink-flare) 0%, rgba(255, 143, 180, 0) 24%),
+        radial-gradient(circle at 62% 78%, var(--blue-flare) 0%, rgba(146, 214, 255, 0) 26%),
+        radial-gradient(circle at 28% 86%, var(--mint-flare) 0%, rgba(158, 232, 196, 0) 24%);
+    filter: blur(12px);
+    animation: sky-bloom 9s ease-in-out infinite alternate;
+}
+
 h1,
 h2,
 h3,
@@ -77,6 +95,7 @@ a {
     min-height: 100dvh;
     padding: 1.1rem;
     overflow: hidden;
+    isolation: isolate;
 }
 
 .hunt-screen::before,
@@ -95,6 +114,7 @@ a {
         radial-gradient(circle at 88% 16%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 16%),
         radial-gradient(circle at 52% 10%, var(--pink-haze) 0%, rgba(255, 168, 198, 0) 28%);
     opacity: 0.95;
+    animation: sky-bloom 6.8s ease-in-out infinite alternate;
 }
 
 .hunt-screen::after {
@@ -106,6 +126,7 @@ a {
         linear-gradient(180deg, rgba(140, 219, 165, 0) 0%, rgba(140, 219, 165, 0.32) 100%);
     filter: blur(12px);
     opacity: 0.88;
+    animation: meadow-wave 5.2s ease-in-out infinite alternate;
 }
 
 .decor-garden,
@@ -130,6 +151,313 @@ a {
     opacity: 0.96;
 }
 
+.scene-backdrop,
+.scene-layer {
+    position: absolute;
+    inset: 0;
+}
+
+.scene-backdrop {
+    z-index: 0;
+    overflow: hidden;
+}
+
+.scene-layer {
+    pointer-events: none;
+}
+
+.scene-layer-flight {
+    z-index: 0;
+}
+
+.scene-layer-heat {
+    z-index: 0;
+}
+
+.ambient-ribbon,
+.scene-egg-svg,
+.scene-rabbit-svg {
+    position: absolute;
+    display: block;
+}
+
+.heat-wave {
+    position: absolute;
+    display: block;
+    inset: auto;
+    width: 22rem;
+    height: 22rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.12) 34%, rgba(255, 255, 255, 0) 72%);
+    filter: blur(10px);
+    opacity: 0;
+    transform: scale(0.75);
+}
+
+.ambient-ribbon {
+    width: 22rem;
+    height: 6rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.28) 26%, rgba(255, 255, 255, 0) 100%);
+    filter: blur(8px);
+    opacity: 0.8;
+    mix-blend-mode: screen;
+    animation: ribbon-drift 4.6s ease-in-out infinite;
+}
+
+.ribbon-one {
+    top: 12%;
+    left: -8%;
+}
+
+.ribbon-two {
+    top: 32%;
+    right: -6%;
+    animation-delay: 0.8s;
+}
+
+.ribbon-three {
+    top: 58%;
+    left: 18%;
+    animation-delay: 1.6s;
+}
+
+.ribbon-four {
+    top: 72%;
+    right: 18%;
+    width: 18rem;
+    animation-delay: 1.1s;
+}
+
+.heat-wave-one {
+    top: 16%;
+    right: 18%;
+}
+
+.heat-wave-two {
+    top: 38%;
+    left: 10%;
+}
+
+.heat-wave-three {
+    bottom: 8%;
+    right: 8%;
+}
+
+.scene-egg-svg {
+    width: 4.8rem;
+    height: auto;
+    filter: drop-shadow(0 14px 24px rgba(180, 118, 130, 0.24));
+    transform-origin: center center;
+}
+
+.scene-rabbit-svg {
+    width: 10rem;
+    height: auto;
+    filter: drop-shadow(0 20px 32px rgba(154, 120, 137, 0.18));
+    transform-origin: center center;
+}
+
+.egg-flight,
+.rabbit-flight {
+    opacity: 0.72;
+}
+
+.egg-flight {
+    animation: scene-flight 3s ease-in-out infinite;
+}
+
+.rabbit-flight {
+    animation: rabbit-hop 3.4s ease-in-out infinite;
+}
+
+.egg-flight-one {
+    top: 14%;
+    left: 8%;
+}
+
+.egg-flight-two {
+    top: 24%;
+    right: 10%;
+    width: 4.2rem;
+    animation-delay: 0.7s;
+}
+
+.egg-flight-three {
+    top: 56%;
+    left: 18%;
+    width: 4rem;
+    animation-delay: 1.15s;
+}
+
+.egg-flight-four {
+    top: 10%;
+    left: 72%;
+    width: 3.8rem;
+    animation-delay: 0.4s;
+}
+
+.egg-flight-five {
+    top: 48%;
+    right: 26%;
+    width: 4.3rem;
+    animation-delay: 1.45s;
+}
+
+.rabbit-flight-one {
+    top: 18%;
+    right: 16%;
+    width: 8.8rem;
+}
+
+.rabbit-flight-two {
+    top: 58%;
+    left: 66%;
+    width: 7.8rem;
+    animation-delay: 1s;
+}
+
+.rabbit-flight-three {
+    top: 8%;
+    left: 32%;
+    width: 7.2rem;
+    animation-delay: 0.55s;
+}
+
+.scene-layer-ground {
+    z-index: 0;
+}
+
+.decor-egg-svg,
+.decor-rabbit-svg {
+    opacity: 0.58;
+}
+
+.decor-egg-svg {
+    animation: drift-ornament 5.6s ease-in-out infinite;
+}
+
+.decor-rabbit-svg {
+    animation: rabbit-hop 4.2s ease-in-out infinite;
+}
+
+.decor-egg-svg-one {
+    left: 3%;
+    bottom: 22%;
+    width: 5rem;
+}
+
+.decor-egg-svg-two {
+    right: 6%;
+    bottom: 20%;
+    width: 4.4rem;
+    animation-delay: 0.55s;
+}
+
+.decor-egg-svg-three {
+    right: 18%;
+    bottom: 10%;
+    width: 4.8rem;
+    animation-delay: 1.1s;
+}
+
+.decor-rabbit-svg-one {
+    left: -1%;
+    bottom: 2%;
+    width: 9.5rem;
+}
+
+.decor-rabbit-svg-two {
+    right: -1%;
+    bottom: 0;
+    width: 8.4rem;
+    animation-delay: 0.95s;
+}
+
+.scene-settings .scene-rabbit-svg,
+.scene-settings .scene-egg-svg {
+    opacity: 0.66;
+}
+
+.scene-hunt .scene-rabbit-svg,
+.scene-hunt .scene-egg-svg {
+    opacity: 0.82;
+}
+
+.scene-hunt .ambient-ribbon {
+    opacity: 0.95;
+}
+
+.scene-hunt .heat-wave {
+    animation: heat-surge 2.8s ease-in-out infinite;
+}
+
+.scene-hunt .heat-wave-two {
+    animation-delay: 0.7s;
+}
+
+.scene-hunt .heat-wave-three {
+    animation-delay: 1.35s;
+}
+
+.hunt-screen.heat-cold .scene-hunt .heat-wave {
+    opacity: 0.12;
+    background: radial-gradient(circle, rgba(146, 214, 255, 0.34) 0%, rgba(146, 214, 255, 0.14) 38%, rgba(146, 214, 255, 0) 74%);
+}
+
+.hunt-screen.heat-cold .scene-hunt .egg-flight,
+.hunt-screen.heat-cold .scene-hunt .rabbit-flight {
+    opacity: 0.58;
+    animation-duration: 3.8s;
+}
+
+.hunt-screen.heat-cold .scene-hunt .ambient-ribbon {
+    opacity: 0.5;
+}
+
+.hunt-screen.heat-cold .scene-hunt .cloud {
+    opacity: 0.72;
+}
+
+.hunt-screen.heat-warm .scene-hunt .heat-wave {
+    opacity: 0.22;
+    background: radial-gradient(circle, rgba(255, 216, 107, 0.34) 0%, rgba(255, 216, 107, 0.16) 38%, rgba(255, 216, 107, 0) 74%);
+}
+
+.hunt-screen.heat-warm .scene-hunt .egg-flight,
+.hunt-screen.heat-warm .scene-hunt .rabbit-flight {
+    opacity: 0.8;
+    animation-duration: 2.7s;
+}
+
+.hunt-screen.heat-warm .scene-hunt .ambient-ribbon {
+    opacity: 0.84;
+}
+
+.hunt-screen.heat-hot .scene-hunt .heat-wave {
+    opacity: 0.34;
+    background: radial-gradient(circle, rgba(255, 143, 180, 0.42) 0%, rgba(255, 216, 107, 0.22) 34%, rgba(255, 143, 180, 0) 74%);
+}
+
+.hunt-screen.heat-hot .scene-hunt .egg-flight,
+.hunt-screen.heat-hot .scene-hunt .rabbit-flight {
+    opacity: 0.96;
+    animation-duration: 2s;
+}
+
+.hunt-screen.heat-hot .scene-hunt .spark {
+    animation-duration: 0.78s;
+}
+
+.hunt-screen.heat-hot .scene-hunt .ambient-ribbon {
+    opacity: 1;
+}
+
+.hunt-screen.heat-hot .scene-hunt .scene-egg-svg,
+.hunt-screen.heat-hot .scene-hunt .scene-rabbit-svg {
+    filter: drop-shadow(0 18px 28px rgba(255, 146, 120, 0.26));
+}
+
 .cloud,
 .spark {
     position: absolute;
@@ -143,7 +471,7 @@ a {
     border-radius: 999px;
     box-shadow: 0 16px 28px rgba(152, 186, 221, 0.16);
     filter: blur(1px);
-    animation: drift 15s linear infinite;
+    animation: drift 8s linear infinite;
 }
 
 .cloud::before,
@@ -176,13 +504,29 @@ a {
 .cloud-two {
     top: 9rem;
     right: -3rem;
-    animation-duration: 19s;
+    animation-duration: 10s;
 }
 
 .cloud-three {
     top: 18rem;
     left: 18%;
-    animation-duration: 22s;
+    animation-duration: 11.5s;
+}
+
+.cloud-four {
+    top: 6rem;
+    left: 54%;
+    width: 8.8rem;
+    height: 3.3rem;
+    animation-duration: 7s;
+}
+
+.cloud-five {
+    top: 24rem;
+    right: 18%;
+    width: 7.8rem;
+    height: 2.9rem;
+    animation-duration: 6.5s;
 }
 
 .spark {
@@ -191,7 +535,7 @@ a {
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 70%);
     box-shadow: 0 0 18px rgba(255, 255, 255, 0.75);
-    animation: twinkle 2.3s ease-in-out infinite;
+    animation: twinkle 1.15s ease-in-out infinite;
 }
 
 .spark-one {
@@ -209,6 +553,24 @@ a {
     top: 22rem;
     left: 12%;
     animation-delay: 1.1s;
+}
+
+.spark-four {
+    top: 5rem;
+    right: 16%;
+    animation-delay: 0.25s;
+}
+
+.spark-five {
+    top: 17rem;
+    left: 58%;
+    animation-delay: 0.82s;
+}
+
+.spark-six {
+    top: 29rem;
+    right: 22%;
+    animation-delay: 0.45s;
 }
 
 .hero-card,
@@ -422,11 +784,43 @@ a {
     justify-content: center;
 }
 
+.hero-rabbit-svg {
+    width: min(100%, 13rem);
+    height: auto;
+    filter: drop-shadow(0 24px 30px rgba(178, 112, 137, 0.2));
+    animation: rabbit-hop 2.8s ease-in-out infinite;
+}
+
+.hero-egg-svg {
+    position: absolute;
+    width: 3.5rem;
+    height: auto;
+    filter: drop-shadow(0 16px 22px rgba(184, 113, 143, 0.22));
+    animation: scene-flight 2s ease-in-out infinite;
+}
+
+.hero-egg-a {
+    left: 0.5rem;
+    bottom: 2.2rem;
+}
+
+.hero-egg-b {
+    right: 0.8rem;
+    top: 2rem;
+    animation-delay: 0.5s;
+}
+
+.hero-egg-c {
+    right: 4.2rem;
+    bottom: 0.6rem;
+    animation-delay: 0.95s;
+}
+
 .bunny-mascot {
     position: relative;
     width: 12rem;
     height: 13rem;
-    animation: float 3.8s ease-in-out infinite;
+    animation: float 2.1s ease-in-out infinite;
 }
 
 .bunny-ear {
@@ -519,7 +913,7 @@ a {
     height: 4rem;
     border-radius: 50% 50% 46% 46%;
     box-shadow: inset 0 -10px 0 rgba(255, 255, 255, 0.25);
-    animation: bob 3s ease-in-out infinite;
+    animation: bob 1.75s ease-in-out infinite;
 }
 
 .floating-egg::before,
@@ -608,7 +1002,7 @@ a {
 .orbit {
     border-radius: 50%;
     border: 2px dashed rgba(255, 255, 255, 0.55);
-    animation: spin-slow 16s linear infinite;
+    animation: spin-slow 8s linear infinite;
 }
 
 .orbit-one {
@@ -620,7 +1014,7 @@ a {
     width: 17rem;
     height: 17rem;
     animation-direction: reverse;
-    animation-duration: 11s;
+    animation-duration: 5.4s;
 }
 
 .compass-star {
@@ -690,7 +1084,7 @@ a {
 }
 
 .compass-pointer.is-live {
-    animation: pulse-glow 1.8s ease-in-out infinite;
+    animation: pulse-glow 0.95s ease-in-out infinite;
 }
 
 .pointer-head,
@@ -831,6 +1225,7 @@ a {
     position: absolute;
     inset: 0;
     overflow: hidden;
+    z-index: 3;
 }
 
 .confetti-rain span {
@@ -839,7 +1234,7 @@ a {
     width: 1rem;
     height: 1.4rem;
     border-radius: 0.7rem;
-    animation: confetti-fall 4.2s linear infinite;
+    animation: confetti-fall 2.5s linear infinite;
 }
 
 .confetti-rain span:nth-child(1) {
@@ -875,6 +1270,101 @@ a {
     left: 90%;
     background: var(--lavender);
     animation-delay: 1.7s;
+}
+
+.victory-parade {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.victory-beam,
+.victory-egg-svg,
+.victory-rabbit-svg {
+    position: absolute;
+    display: block;
+}
+
+.victory-beam {
+    top: -12%;
+    width: 18rem;
+    height: 42rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 22%, rgba(255, 255, 255, 0) 100%);
+    filter: blur(10px);
+    opacity: 0.6;
+    animation: victory-beam-sway 2.8s ease-in-out infinite;
+}
+
+.beam-one {
+    left: 4%;
+}
+
+.beam-two {
+    left: 40%;
+    animation-delay: 0.6s;
+}
+
+.beam-three {
+    right: 2%;
+    animation-delay: 1.2s;
+}
+
+.victory-egg-svg {
+    width: 4.5rem;
+    filter: drop-shadow(0 18px 26px rgba(184, 113, 143, 0.22));
+    animation: victory-drop 2.1s linear infinite;
+}
+
+.victory-drop-one {
+    left: 8%;
+    animation-delay: 0s;
+}
+
+.victory-drop-two {
+    left: 26%;
+    animation-delay: 0.35s;
+}
+
+.victory-drop-three {
+    left: 48%;
+    animation-delay: 0.8s;
+}
+
+.victory-drop-four {
+    left: 68%;
+    animation-delay: 0.2s;
+}
+
+.victory-drop-five {
+    left: 86%;
+    animation-delay: 1.05s;
+}
+
+.victory-rabbit-svg {
+    width: 8.2rem;
+    filter: drop-shadow(0 20px 30px rgba(154, 120, 137, 0.18));
+    animation: victory-hop 2.9s ease-in-out infinite;
+}
+
+.victory-hop-one {
+    left: 12%;
+    bottom: 6%;
+}
+
+.victory-hop-two {
+    right: 14%;
+    bottom: 4%;
+    animation-delay: 0.85s;
+}
+
+.victory-hop-three {
+    left: 44%;
+    bottom: 2%;
+    width: 7.4rem;
+    animation-delay: 1.4s;
 }
 
 #blazor-error-ui {
@@ -1146,7 +1636,7 @@ a {
     padding: 1.5rem;
     text-align: center;
     box-shadow: 0 28px 60px rgba(184, 113, 143, 0.24);
-    animation: transition-pop 420ms ease-out;
+    animation: transition-pop 260ms ease-out;
 }
 
 .transition-card h1 {
@@ -1178,7 +1668,7 @@ a {
     height: 5.4rem;
     border-radius: 55% 55% 50% 50%;
     box-shadow: inset 0 -0.7rem 0 rgba(255, 255, 255, 0.24), 0 12px 24px rgba(180, 118, 130, 0.18);
-    animation: bounce-egg 1.3s ease-in-out infinite;
+    animation: bounce-egg 0.8s ease-in-out infinite;
 }
 
 .transition-egg.egg-one {
@@ -1206,6 +1696,114 @@ a {
     }
 }
 
+@keyframes scene-flight {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    }
+
+    25% {
+        transform: translate3d(12px, -14px, 0) rotate(8deg) scale(1.02);
+    }
+
+    50% {
+        transform: translate3d(-10px, -24px, 0) rotate(-6deg) scale(1.05);
+    }
+
+    75% {
+        transform: translate3d(10px, -10px, 0) rotate(6deg) scale(0.98);
+    }
+}
+
+@keyframes heat-surge {
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0.72);
+    }
+
+    50% {
+        opacity: 0.22;
+        transform: scale(1.18);
+    }
+}
+
+@keyframes rabbit-hop {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    30% {
+        transform: translate3d(8px, -10px, 0) rotate(3deg);
+    }
+
+    55% {
+        transform: translate3d(-6px, -24px, 0) rotate(-4deg);
+    }
+
+    80% {
+        transform: translate3d(6px, -8px, 0) rotate(2deg);
+    }
+}
+
+@keyframes ribbon-drift {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(-7deg) scaleX(1);
+    }
+
+    50% {
+        transform: translate3d(24px, -12px, 0) rotate(7deg) scaleX(1.08);
+    }
+}
+
+@keyframes victory-drop {
+    0% {
+        transform: translate3d(0, -16dvh, 0) rotate(0deg) scale(0.8);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate3d(0, 118dvh, 0) rotate(520deg) scale(1.06);
+        opacity: 0.95;
+    }
+}
+
+@keyframes victory-hop {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    30% {
+        transform: translate3d(12px, -14px, 0) rotate(4deg);
+    }
+
+    55% {
+        transform: translate3d(-10px, -30px, 0) rotate(-5deg);
+    }
+
+    80% {
+        transform: translate3d(8px, -10px, 0) rotate(2deg);
+    }
+}
+
+@keyframes victory-beam-sway {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(-8deg);
+    }
+
+    50% {
+        transform: translate3d(18px, -8px, 0) rotate(8deg);
+    }
+}
+
 @keyframes transition-pop {
     from {
         opacity: 0;
@@ -1224,7 +1822,7 @@ a {
     }
 
     50% {
-        transform: translateX(30px);
+        transform: translateX(46px) translateY(-8px);
     }
 
     100% {
@@ -1239,7 +1837,7 @@ a {
     }
 
     50% {
-        transform: translate3d(0, -14px, 0) rotate(4deg);
+        transform: translate3d(0, -18px, 0) rotate(8deg);
     }
 }
 
@@ -1250,7 +1848,7 @@ a {
     }
 
     50% {
-        transform: translate3d(0, -10px, 0);
+        transform: translate3d(0, -18px, 0);
     }
 }
 
@@ -1258,12 +1856,12 @@ a {
     0%,
     100% {
         opacity: 0.3;
-        transform: scale(0.8);
+        transform: scale(0.7);
     }
 
     50% {
         opacity: 1;
-        transform: scale(1.2);
+        transform: scale(1.45);
     }
 }
 
@@ -1274,7 +1872,7 @@ a {
     }
 
     50% {
-        transform: translateY(-10px);
+        transform: translateY(-16px);
     }
 }
 
@@ -1285,7 +1883,29 @@ a {
     }
 
     50% {
-        transform: translateY(-8px) rotate(4deg);
+        transform: translateY(-14px) rotate(7deg);
+    }
+}
+
+@keyframes sky-bloom {
+    0% {
+        transform: translate3d(-1.5%, -1.5%, 0) scale(1);
+        opacity: 0.82;
+    }
+
+    100% {
+        transform: translate3d(1.5%, 1.5%, 0) scale(1.08);
+        opacity: 1;
+    }
+}
+
+@keyframes meadow-wave {
+    0% {
+        transform: translate3d(-1.2%, 0, 0) scaleX(1);
+    }
+
+    100% {
+        transform: translate3d(1.2%, -2%, 0) scaleX(1.08);
     }
 }
 
@@ -1322,7 +1942,7 @@ a {
     }
 
     50% {
-        filter: drop-shadow(0 0 18px rgba(228, 86, 133, 0.32));
+        filter: drop-shadow(0 0 26px rgba(228, 86, 133, 0.42));
     }
 }
 
@@ -1338,9 +1958,16 @@ a {
         font-size: clamp(2rem, 11vw, 3rem);
     }
 
+    .rabbit-flight-two,
+    .rabbit-flight-three,
     .decor-bunny.bunny-two,
     .decor-egg.egg-three,
-    .decor-egg.egg-four {
+    .decor-egg.egg-four,
+    .decor-rabbit-svg-two,
+    .decor-egg-svg-three,
+    .egg-flight-five,
+    .victory-hop-three,
+    .beam-three {
         display: none;
     }
 }
@@ -1359,6 +1986,14 @@ a {
 
     .hero-visual {
         min-height: 210px;
+    }
+
+    .hero-rabbit-svg {
+        width: 11rem;
+    }
+
+    .hero-egg-svg {
+        width: 3rem;
     }
 
     .form-grid {
@@ -1396,6 +2031,25 @@ a {
     .compass-footer-actions {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .ambient-ribbon,
+    .egg-flight-three,
+    .rabbit-flight-one,
+    .decor-rabbit-svg-one,
+    .egg-flight-four,
+    .cloud-five,
+    .spark-six,
+    .beam-two {
+        display: none;
+    }
+
+    .victory-egg-svg {
+        width: 3.7rem;
+    }
+
+    .victory-rabbit-svg {
+        width: 6.6rem;
     }
 }
 

@@ -5,14 +5,7 @@
 <PageTitle>Chasse aux trésors de Pâque</PageTitle>
 
 <div class="hunt-screen settings-screen">
-	<div class="sky-layer">
-		<span class="cloud cloud-one"></span>
-		<span class="cloud cloud-two"></span>
-		<span class="cloud cloud-three"></span>
-		<span class="spark spark-one"></span>
-		<span class="spark spark-two"></span>
-		<span class="spark spark-three"></span>
-	</div>
+	<AnimatedEasterScene SceneClass="scene-settings" />
 
 	<section class="settings-shell">
 		<MudPaper Class="settings-hero hero-card mud-shell-card" Elevation="0">
@@ -32,20 +25,47 @@
 			</div>
 
 			<div class="hero-visual settings-visual" aria-hidden="true">
-				<div class="bunny-mascot">
-					<div class="bunny-ear left"></div>
-					<div class="bunny-ear right"></div>
-					<div class="bunny-head">
-						<span class="eye left"></span>
-						<span class="eye right"></span>
-						<span class="nose"></span>
-						<span class="cheek left"></span>
-						<span class="cheek right"></span>
-					</div>
-				</div>
-				<div class="floating-egg egg-a"></div>
-				<div class="floating-egg egg-b"></div>
-				<div class="floating-egg egg-c"></div>
+				<svg class="hero-rabbit-svg" viewBox="0 0 220 220" role="presentation">
+					<defs>
+						<linearGradient id="heroRabbitBody" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0%" stop-color="#ffffff" />
+							<stop offset="100%" stop-color="#ffeef4" />
+						</linearGradient>
+					</defs>
+					<ellipse cx="104" cy="154" rx="54" ry="40" fill="url(#heroRabbitBody)" />
+					<ellipse cx="146" cy="105" rx="38" ry="35" fill="url(#heroRabbitBody)" />
+					<ellipse cx="130" cy="42" rx="15" ry="50" fill="#ffffff" transform="rotate(-8 130 42)" />
+					<ellipse cx="160" cy="40" rx="15" ry="54" fill="#ffffff" transform="rotate(8 160 40)" />
+					<ellipse cx="130" cy="44" rx="7" ry="34" fill="#ffd2e1" transform="rotate(-8 130 44)" />
+					<ellipse cx="160" cy="42" rx="7" ry="38" fill="#ffd2e1" transform="rotate(8 160 42)" />
+					<circle cx="174" cy="148" r="15" fill="#ffffff" />
+					<circle cx="138" cy="102" r="4" fill="#3e3340" />
+					<circle cx="154" cy="102" r="4" fill="#3e3340" />
+					<ellipse cx="146" cy="116" rx="8" ry="6" fill="#ff98bb" />
+					<ellipse cx="132" cy="124" rx="10" ry="6" fill="#ffd8e5" />
+					<ellipse cx="160" cy="124" rx="10" ry="6" fill="#ffd8e5" />
+				</svg>
+
+				<svg class="hero-egg-svg hero-egg-a" viewBox="0 0 64 84" role="presentation">
+					<path d="M32 6C20 6 10 20 10 38c0 23 14 40 22 40s22-17 22-40C54 20 44 6 32 6Z" fill="#ff8fb4" />
+					<path d="M18 28c8 6 20 6 28 0" stroke="#fff0f5" stroke-width="5" stroke-linecap="round" fill="none" />
+					<path d="M17 42h30" stroke="#fff0f5" stroke-width="5" stroke-linecap="round" />
+					<path d="M18 56c8-6 20-6 28 0" stroke="#fff0f5" stroke-width="5" stroke-linecap="round" fill="none" />
+				</svg>
+
+				<svg class="hero-egg-svg hero-egg-b" viewBox="0 0 64 84" role="presentation">
+					<path d="M32 6C20 6 10 20 10 38c0 23 14 40 22 40s22-17 22-40C54 20 44 6 32 6Z" fill="#9ee8c4" />
+					<path d="M18 30h28" stroke="#f6fffb" stroke-width="5" stroke-linecap="round" />
+					<path d="M18 44c7-6 21-6 28 0" stroke="#f6fffb" stroke-width="5" stroke-linecap="round" fill="none" />
+					<path d="M18 58c7 6 21 6 28 0" stroke="#f6fffb" stroke-width="5" stroke-linecap="round" fill="none" />
+				</svg>
+
+				<svg class="hero-egg-svg hero-egg-c" viewBox="0 0 64 84" role="presentation">
+					<path d="M32 6C20 6 10 20 10 38c0 23 14 40 22 40s22-17 22-40C54 20 44 6 32 6Z" fill="#ffd86b" />
+					<path d="M18 28l6 4 8-4 8 4 6-4" stroke="#fff7da" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+					<path d="M18 42c8 6 20 6 28 0" stroke="#fff7da" stroke-width="5" stroke-linecap="round" fill="none" />
+					<path d="M18 56l6-4 8 4 8-4 6 4" stroke="#fff7da" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+				</svg>
 			</div>
 		</MudPaper>
 
