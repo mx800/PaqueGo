@@ -307,7 +307,22 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
             return;
         }
 
-        foundTargetIds.Add(ActiveTarget.Id);
+        await MarkTargetFoundAsync(ActiveTarget.Id);
+    }
+
+    /// <summary>
+    /// Marks a specific egg as found and selects the next nearest target.
+    /// </summary>
+    /// <param name="targetId">The identifier of the egg to mark as found.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task MarkTargetFoundAsync(string targetId)
+    {
+        if (string.IsNullOrWhiteSpace(targetId) || foundTargetIds.Contains(targetId) || targets.All(target => target.Id != targetId))
+        {
+            return;
+        }
+
+        foundTargetIds.Add(targetId);
         RecomputeDerivedState();
         await PersistProgressAsync();
         NotifyStateChanged();

@@ -24,6 +24,46 @@
 		</div>
 	}
 
+	@if (showEggFoundSequence)
+	{
+		<div class="found-overlay"
+			 role="button"
+			 tabindex="0"
+			 aria-label="Passer au prochain oeuf"
+			 @onclick="CompleteEggFoundSequenceAsync"
+			 @onkeydown="HandleFoundOverlayKeyDown">
+			<div class="found-overlay-shell">
+				<div class="found-burst" aria-hidden="true">
+					<span class="found-ray ray-one"></span>
+					<span class="found-ray ray-two"></span>
+					<span class="found-ray ray-three"></span>
+					<span class="found-ray ray-four"></span>
+					<span class="found-ray ray-five"></span>
+					<span class="found-ray ray-six"></span>
+					<span class="found-spark spark-one"></span>
+					<span class="found-spark spark-two"></span>
+					<span class="found-spark spark-three"></span>
+					<span class="found-spark spark-four"></span>
+					<span class="found-spark spark-five"></span>
+					<span class="found-spark spark-six"></span>
+					<div class="found-core-glow"></div>
+					<div class="found-egg-mark"></div>
+				</div>
+
+				<div class="found-overlay-card">
+					<div class="found-overlay-ribbon">@foundSequenceRibbon</div>
+					<h2>@foundSequenceTitle</h2>
+					@if (!string.IsNullOrWhiteSpace(foundSequenceEggName))
+					{
+						<p class="found-overlay-name">@foundSequenceEggName</p>
+					}
+					<p>@foundSequenceMessage</p>
+					<p class="found-overlay-hint">Touchez l'ecran pour continuer</p>
+				</div>
+			</div>
+		</div>
+	}
+
 	<section class="play-stage">
 		<section class="play-layout">
 			<MudPaper Class="game-card compass-card immersive-compass-card mud-shell-card" Elevation="0">
@@ -73,7 +113,7 @@
 							   Color="Color.Success"
 							   StartIcon="@Icons.Material.Filled.CheckCircle"
 							   OnClick="@MarkCurrentTargetFoundAsync"
-							   Disabled="@(HuntService.ActiveTarget is null)"
+							   Disabled="@(HuntService.ActiveTarget is null || isFindingEgg)"
 							   Class="success-button compass-primary-action">
 						Oeuf trouvé !
 					</MudButton>
@@ -111,6 +151,14 @@
 	private readonly PeriodicTimer _refreshTimer = new(TimeSpan.FromSeconds(1));
 	private readonly CancellationTokenSource _refreshCts = new();
 	private bool showTransition = true;
+	private bool showEggFoundSequence;
+	private bool isFindingEgg;
+	private bool isCompletingEggFoundSequence;
+	private string foundSequenceRibbon = "Oeuf trouve";
+	private string foundSequenceTitle = string.Empty;
+	private string foundSequenceMessage = string.Empty;
+	private string? foundSequenceEggName;
+	private string? pendingFoundTargetId;
 	private string? runtimeMessage;
 
 	protected override async Task OnInitializedAsync()
@@ -179,7 +227,65 @@
 
 	private async Task MarkCurrentTargetFoundAsync()
 	{
-		await HuntService.MarkCurrentTargetFoundAsync();
+		if (isFindingEgg || HuntService.ActiveTarget is null)
+		{
+			return;
+		}
+
+		var currentTargetName = string.IsNullOrWhiteSpace(HuntService.ActiveTarget.Name)
+			? "Un oeuf mystere"
+			: HuntService.ActiveTarget.Name;
+		pendingFoundTargetId = HuntService.ActiveTarget.Id;
+		var isFinalEgg = HuntService.FoundCount + 1 >= HuntService.TotalCount;
+
+		foundSequenceRibbon = isFinalEgg ? "Dernier oeuf" : "Oeuf trouve";
+		foundSequenceTitle = isFinalEgg ? "Le panier s'illumine" : "Une etincelle traverse le jardin";
+		foundSequenceEggName = currentTargetName;
+		foundSequenceMessage = isFinalEgg
+			? "Une pluie doree attend ton signal pour lancer le final."
+			: "Le sentier magique se revele. Appuie pour faire apparaitre la prochaine piste.";
+
+		showEggFoundSequence = true;
+		isFindingEgg = true;
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private async Task CompleteEggFoundSequenceAsync()
+	{
+		if (!showEggFoundSequence || !isFindingEgg || isCompletingEggFoundSequence || string.IsNullOrWhiteSpace(pendingFoundTargetId))
+		{
+			return;
+		}
+
+		isCompletingEggFoundSequence = true;
+
+		try
+		{
+			await HuntService.MarkTargetFoundAsync(pendingFoundTargetId);
+		}
+		catch (Exception exception)
+		{
+			runtimeMessage = $"Impossible de valider cet oeuf : {exception.Message}";
+		}
+		finally
+		{
+			showEggFoundSequence = false;
+			isFindingEgg = false;
+			isCompletingEggFoundSequence = false;
+			foundSequenceEggName = null;
+			pendingFoundTargetId = null;
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+
+	private Task HandleFoundOverlayKeyDown(KeyboardEventArgs eventArgs)
+	{
+		if (eventArgs.Key is "Enter" or " ")
+		{
+			return CompleteEggFoundSequenceAsync();
+		}
+
+		return Task.CompletedTask;
 	}
 
 	public void Dispose()
