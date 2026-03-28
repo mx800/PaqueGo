@@ -429,6 +429,35 @@
 		var isFinalEgg = HuntService.FoundCount + 1 >= HuntService.TotalCount;
 		isPendingFinalEgg = isFinalEgg;
 
+		if (isFinalEgg)
+		{
+			try
+			{
+				await HuntService.MarkTargetFoundAsync(pendingFoundTargetId);
+				showEggFoundSequence = false;
+				showFinalVictorySequence = HuntService.IsCompleted;
+				isFindingEgg = showFinalVictorySequence;
+				foundSequenceEggName = null;
+				pendingFoundTargetId = null;
+				isPendingFinalEgg = false;
+				audioStateDirty = true;
+				await InvokeAsync(StateHasChanged);
+			}
+			catch (Exception exception)
+			{
+				runtimeMessage = $"Impossible de valider cet oeuf : {exception.Message}";
+				showEggFoundSequence = false;
+				showFinalVictorySequence = false;
+				isFindingEgg = false;
+				pendingFoundTargetId = null;
+				isPendingFinalEgg = false;
+				audioStateDirty = true;
+				await InvokeAsync(StateHasChanged);
+			}
+
+			return;
+		}
+
 		foundSequenceRibbon = isFinalEgg ? "Dernier oeuf" : "Oeuf trouve";
 		foundSequenceTitle = isFinalEgg ? "Le panier s'illumine" : "Une etincelle traverse le jardin";
 		foundSequenceEggName = currentTargetName;

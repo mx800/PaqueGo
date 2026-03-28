@@ -18,7 +18,6 @@ window.paqueGo = (() => {
         noiseBuffer: null,
         searchTracks: [],
         activeSearchTrackIndex: 0,
-        searchTrackFadeIntervalId: null,
         searchLoopMonitorIntervalId: null,
         searchCrossfadeInProgress: false,
         victoryTrack: null,
@@ -229,11 +228,19 @@ window.paqueGo = (() => {
         }
     };
 
-    const clearSearchTrackFade = () => {
-        if (audio.searchTrackFadeIntervalId !== null) {
-            window.clearInterval(audio.searchTrackFadeIntervalId);
-            audio.searchTrackFadeIntervalId = null;
+    const clearTrackFade = (track) => {
+        if (!track || typeof track.__paqueGoFadeIntervalId === "undefined") {
+            return;
         }
+
+        if (track.__paqueGoFadeIntervalId !== null) {
+            window.clearInterval(track.__paqueGoFadeIntervalId);
+            track.__paqueGoFadeIntervalId = null;
+        }
+    };
+
+    const clearAllSearchTrackFades = () => {
+        audio.searchTracks.forEach((track) => clearTrackFade(track));
     };
 
     const clearSearchLoopMonitor = () => {
@@ -253,7 +260,39 @@ window.paqueGo = (() => {
             track.loop = false;
             track.preload = "auto";
             track.volume = 0;
+            track.__paqueGoFadeIntervalId = null;
             return track;
+        });
+
+        audio.searchTracks.forEach((track, trackIndex) => {
+            track.addEventListener("ended", () => {
+                if (!audio.isSearchActive || audio.searchCrossfadeInProgress || audio.activeSearchTrackIndex !== trackIndex) {
+                    return;
+                }
+
+                const nextTrackIndex = (trackIndex + 1) % audio.searchTracks.length;
+                const nextTrack = audio.searchTracks[nextTrackIndex];
+
+                if (!nextTrack) {
+                    return;
+                }
+
+                audio.searchCrossfadeInProgress = true;
+                nextTrack.pause();
+                nextTrack.currentTime = 0;
+                nextTrack.volume = 0;
+
+                nextTrack.play()
+                    .then(() => {
+                        fadeTrackVolume(nextTrack, 0.18, 200, false);
+                        audio.activeSearchTrackIndex = nextTrackIndex;
+                    })
+                    .catch(() => {
+                    })
+                    .finally(() => {
+                        audio.searchCrossfadeInProgress = false;
+                    });
+            });
         });
 
         return audio.searchTracks;
@@ -278,19 +317,19 @@ window.paqueGo = (() => {
             return;
         }
 
-        clearSearchTrackFade();
+        clearTrackFade(track);
 
         const startVolume = Number.isFinite(track.volume) ? track.volume : 0;
         const stepCount = Math.max(1, Math.round(durationMs / 60));
         let stepIndex = 0;
 
-        audio.searchTrackFadeIntervalId = window.setInterval(() => {
+        track.__paqueGoFadeIntervalId = window.setInterval(() => {
             stepIndex += 1;
             const progress = stepIndex / stepCount;
             track.volume = Math.max(0, Math.min(1, startVolume + (targetVolume - startVolume) * progress));
 
             if (stepIndex >= stepCount) {
-                clearSearchTrackFade();
+                clearTrackFade(track);
                 track.volume = Math.max(0, Math.min(1, targetVolume));
 
                 if (shouldPauseWhenDone) {
@@ -305,7 +344,7 @@ window.paqueGo = (() => {
     };
 
     const stopAllSearchTracks = () => {
-        clearSearchTrackFade();
+        clearAllSearchTrackFades();
         clearSearchLoopMonitor();
         audio.searchCrossfadeInProgress = false;
 
@@ -651,7 +690,7 @@ window.paqueGo = (() => {
         stopSearchAmbience(true);
         clearHeatPulse();
         clearSearchSparkles();
-        clearSearchTrackFade();
+        clearAllSearchTrackFades();
         clearSearchLoopMonitor();
         audio.currentHeatLevel = "Unknown";
         audio.searchCrossfadeInProgress = false;
