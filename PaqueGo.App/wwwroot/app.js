@@ -30,7 +30,10 @@ window.paqueGo = (() => {
         lastButtonClickTime: 0,
         isSearchActive: false,
         isFinalActive: false,
-        currentHeatLevel: "Unknown"
+        currentHeatLevel: "Unknown",
+        currentRelativeBearingDegrees: null,
+        currentAlignmentBucket: "Unknown",
+        targetLockCooldownUntil: 0
     };
 
     let watchId = null;
@@ -47,6 +50,33 @@ window.paqueGo = (() => {
     const normalizeDegrees = (degrees) => {
         const normalized = degrees % 360;
         return normalized < 0 ? normalized + 360 : normalized;
+    };
+
+    const normalizeSignedDegrees = (degrees) => {
+        const normalized = normalizeDegrees(degrees);
+        return normalized > 180 ? normalized - 360 : normalized;
+    };
+
+    const getAlignmentBucket = (relativeBearingDegrees) => {
+        if (typeof relativeBearingDegrees !== "number" || Number.isNaN(relativeBearingDegrees)) {
+            return "Unknown";
+        }
+
+        const absoluteBearing = Math.abs(normalizeSignedDegrees(relativeBearingDegrees));
+
+        if (absoluteBearing <= 8) {
+            return "Locked";
+        }
+
+        if (absoluteBearing <= 20) {
+            return "Aligned";
+        }
+
+        if (absoluteBearing <= 45) {
+            return "Near";
+        }
+
+        return "Searching";
     };
 
     const updateCompassNeedle = () => {
@@ -554,23 +584,35 @@ window.paqueGo = (() => {
         }
 
         const heatProfiles = {
-            Cold: { baseFrequency: 196, accentFrequency: null, sparkleFrequency: null, type: "sine", intervalMs: 1500, volume: 0.036 },
-            Warm: { baseFrequency: 392, accentFrequency: 523.25, sparkleFrequency: null, type: "triangle", intervalMs: 720, volume: 0.058 },
-            Hot: { baseFrequency: 523.25, accentFrequency: 783.99, sparkleFrequency: 1046.5, type: "square", intervalMs: 320, volume: 0.085 }
+            Cold: { baseFrequency: 196, accentFrequency: null, sparkleFrequency: null, lockFrequency: null, type: "sine", intervalMs: 1350, volume: 0.05 },
+            Warm: { baseFrequency: 392, accentFrequency: 523.25, sparkleFrequency: null, lockFrequency: 783.99, type: "triangle", intervalMs: 620, volume: 0.08 },
+            Hot: { baseFrequency: 523.25, accentFrequency: 783.99, sparkleFrequency: 1046.5, lockFrequency: 1318.51, type: "square", intervalMs: 260, volume: 0.118 }
+        };
+
+        const alignmentProfiles = {
+            Unknown: { intervalFactor: 1, volumeBoost: 1, lockToneGain: 0 },
+            Searching: { intervalFactor: 1, volumeBoost: 1, lockToneGain: 0 },
+            Near: { intervalFactor: 0.9, volumeBoost: 1.08, lockToneGain: 0 },
+            Aligned: { intervalFactor: 0.74, volumeBoost: 1.22, lockToneGain: 0.68 },
+            Locked: { intervalFactor: 0.58, volumeBoost: 1.36, lockToneGain: 0.92 }
         };
 
         const profile = heatProfiles[audio.currentHeatLevel];
+        const alignmentProfile = alignmentProfiles[audio.currentAlignmentBucket] ?? alignmentProfiles.Searching;
 
         if (!profile) {
             return;
         }
+
+        const pulseVolume = Math.min(profile.volume * alignmentProfile.volumeBoost, 0.18);
+        const pulseIntervalMs = Math.max(170, Math.round(profile.intervalMs * alignmentProfile.intervalFactor));
 
         await playTone({
             frequency: profile.baseFrequency,
             type: profile.type,
             duration: 0.09,
             release: 0.13,
-            volume: profile.volume
+            volume: pulseVolume
         });
 
         if (profile.accentFrequency) {
@@ -579,7 +621,7 @@ window.paqueGo = (() => {
                 type: "triangle",
                 duration: 0.08,
                 release: 0.12,
-                volume: profile.volume * 0.86,
+                volume: pulseVolume * 0.9,
                 when: 0.08
             });
         }
@@ -590,28 +632,52 @@ window.paqueGo = (() => {
                 type: "sine",
                 duration: 0.07,
                 release: 0.1,
-                volume: profile.volume * 0.78,
+                volume: pulseVolume * 0.84,
                 when: 0.16
+            });
+        }
+
+        if (profile.lockFrequency && alignmentProfile.lockToneGain > 0) {
+            await playTone({
+                frequency: profile.lockFrequency,
+                type: "sine",
+                duration: 0.05,
+                release: 0.08,
+                volume: Math.min(pulseVolume * alignmentProfile.lockToneGain, 0.16),
+                when: 0.12
             });
         }
 
         audio.heatPulseTimeoutId = window.setTimeout(() => {
             void scheduleHeatPulse();
-        }, profile.intervalMs);
+        }, pulseIntervalMs);
     };
 
-    const updateHeatZone = async (heatLevel) => {
+    const updateHeatZone = async (heatLevel, relativeBearingDegrees = null) => {
         const nextHeatLevel = typeof heatLevel === "string" ? heatLevel : "Unknown";
+        const nextRelativeBearingDegrees = typeof relativeBearingDegrees === "number" && !Number.isNaN(relativeBearingDegrees)
+            ? normalizeSignedDegrees(relativeBearingDegrees)
+            : null;
+        const nextAlignmentBucket = getAlignmentBucket(nextRelativeBearingDegrees);
+        const alignmentChanged = audio.currentAlignmentBucket !== nextAlignmentBucket;
 
-        if (audio.currentHeatLevel === nextHeatLevel && (nextHeatLevel === "Unknown" || audio.heatPulseTimeoutId !== null || !audio.isSearchActive)) {
+        if (audio.currentHeatLevel === nextHeatLevel &&
+            audio.currentAlignmentBucket === nextAlignmentBucket &&
+            (nextHeatLevel === "Unknown" || audio.heatPulseTimeoutId !== null || !audio.isSearchActive)) {
             return;
         }
 
         audio.currentHeatLevel = nextHeatLevel;
+        audio.currentRelativeBearingDegrees = nextRelativeBearingDegrees;
+        audio.currentAlignmentBucket = nextAlignmentBucket;
         clearHeatPulse();
 
         if (!audio.isSearchActive || nextHeatLevel === "Unknown") {
             return;
+        }
+
+        if (alignmentChanged && nextAlignmentBucket === "Locked") {
+            await playTargetLockCue();
         }
 
         await scheduleHeatPulse();
@@ -671,6 +737,34 @@ window.paqueGo = (() => {
         });
     };
 
+    const playTargetLockCue = async () => {
+        const now = performance.now();
+
+        if (now < audio.targetLockCooldownUntil) {
+            return;
+        }
+
+        audio.targetLockCooldownUntil = now + 900;
+
+        await playTone({
+            frequency: 783.99,
+            frequencyEnd: 987.77,
+            type: "triangle",
+            duration: 0.04,
+            release: 0.05,
+            volume: 0.082
+        });
+
+        await playTone({
+            frequency: 1174.66,
+            type: "sine",
+            duration: 0.06,
+            release: 0.08,
+            when: 0.055,
+            volume: 0.1
+        });
+    };
+
     const playEggFound = async () => {
         const now = performance.now();
 
@@ -706,6 +800,9 @@ window.paqueGo = (() => {
         const isFinalActive = !!nextState.isFinalActive;
         const isSearchActive = !!nextState.isSearchActive && !isFinalActive;
         const heatLevel = typeof nextState.heatLevel === "string" ? nextState.heatLevel : "Unknown";
+        const relativeBearingDegrees = typeof nextState.relativeBearingDegrees === "number" && !Number.isNaN(nextState.relativeBearingDegrees)
+            ? nextState.relativeBearingDegrees
+            : null;
 
         await ensureAudioContext();
 
@@ -725,7 +822,7 @@ window.paqueGo = (() => {
             }
         }
 
-        await updateHeatZone(isSearchActive ? heatLevel : "Unknown");
+        await updateHeatZone(isSearchActive ? heatLevel : "Unknown", isSearchActive ? relativeBearingDegrees : null);
     };
 
     const stopAllAudio = () => {
@@ -737,6 +834,9 @@ window.paqueGo = (() => {
         clearAllSearchTrackFades();
         clearSearchLoopMonitor();
         audio.currentHeatLevel = "Unknown";
+        audio.currentRelativeBearingDegrees = null;
+        audio.currentAlignmentBucket = "Unknown";
+        audio.targetLockCooldownUntil = 0;
         audio.searchCrossfadeInProgress = false;
         audio.isSearchActive = false;
         audio.isFinalActive = false;

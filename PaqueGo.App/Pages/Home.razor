@@ -270,6 +270,7 @@
 	private HeatLevel? lastSyncedHeatLevel;
 	private bool? lastSearchAmbienceState;
 	private bool? lastFinalAmbienceState;
+	private double? lastSyncedRelativeBearingDegrees;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -359,6 +360,9 @@
 		var isSearchActive = IsSearchAmbienceActive;
 		var nextHeatLevel = isSearchActive ? HuntService.HeatLevel : HeatLevel.Unknown;
 		var isFinalActive = showFinalVictorySequence;
+		var nextRelativeBearingDegrees = isSearchActive && HuntService.RelativeBearingDegrees is double relativeBearing
+			? Math.Round(relativeBearing, 1)
+			: (double?)null;
 		var shouldPlayEggFoundSound = showEggFoundSequence && lastPlayedEggFoundSoundSequence != eggFoundSoundSequence;
 
 		if (!force &&
@@ -366,6 +370,7 @@
 			lastSearchAmbienceState == isSearchActive &&
 			lastSyncedHeatLevel == nextHeatLevel &&
 			lastFinalAmbienceState == isFinalActive &&
+			lastSyncedRelativeBearingDegrees == nextRelativeBearingDegrees &&
 			!shouldPlayEggFoundSound)
 		{
 			return;
@@ -377,7 +382,8 @@
 			{
 				isSearchActive,
 				heatLevel = nextHeatLevel.ToString(),
-				isFinalActive
+				isFinalActive,
+				relativeBearingDegrees = nextRelativeBearingDegrees
 			});
 
 			if (shouldPlayEggFoundSound)
@@ -389,6 +395,7 @@
 			lastSearchAmbienceState = isSearchActive;
 			lastSyncedHeatLevel = nextHeatLevel;
 			lastFinalAmbienceState = isFinalActive;
+			lastSyncedRelativeBearingDegrees = nextRelativeBearingDegrees;
 			audioStateDirty = false;
 		}
 		catch (JSException)

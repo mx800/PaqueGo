@@ -1,4 +1,4 @@
-<div class="compass-shell heat-@HeatLevel.ToString().ToLowerInvariant()">
+<div class="@ShellClasses">
     <div class="orbit orbit-one"></div>
     <div class="orbit orbit-two"></div>
     <div class="compass-star star-one"></div>
@@ -9,11 +9,21 @@
         <span class="cardinal right">E</span>
         <span class="cardinal bottom">S</span>
         <span class="cardinal left">O</span>
-        <div id="compass-pointer" class="compass-pointer @(IsLive ? "is-live" : string.Empty)" style="transform: @PointerRotation;">
+        <div class="compass-lock-indicator" aria-hidden="true">
+            <span class="lock-pulse pulse-outer"></span>
+            <span class="lock-pulse pulse-inner"></span>
+            <span class="lock-core"></span>
+        </div>
+        <div id="compass-pointer" class="@PointerClasses" style="transform: @PointerRotation;">
             <span class="pointer-head"></span>
             <span class="pointer-tail"></span>
         </div>
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(AlignmentHint))
+    {
+        <div class="compass-lock-badge">@AlignmentHint</div>
+    }
 </div>
 
 @code {
@@ -34,5 +44,49 @@
 
     private string PointerRotation => $"rotate({(RelativeBearingDegrees ?? 0d):0.##}deg)";
 
+    private string ShellClasses => $"compass-shell heat-{HeatLevel.ToString().ToLowerInvariant()} {AlignmentCssClass}{(IsNearTarget ? " is-near-target" : string.Empty)}";
+
+    private string PointerClasses => $"compass-pointer {(IsLive ? "is-live " : string.Empty)}{AlignmentCssClass}".Trim();
+
+    private bool IsNearTarget =>
+        HeatLevel == HeatLevel.Hot &&
+        (DistanceMeters is null || DistanceMeters <= 8d);
+
+    private string AlignmentCssClass => BearingErrorDegrees switch
+    {
+        <= 8d => "alignment-locked",
+        <= 20d => "alignment-on-course",
+        <= 45d => "alignment-near",
+        _ => "alignment-searching"
+    };
+
+    private string? AlignmentHint => BearingErrorDegrees switch
+    {
+        <= 8d => "Cap parfait",
+        <= 20d => "Bonne direction",
+        <= 45d when HeatLevel != HeatLevel.Cold => "Continue comme ca",
+        _ => null
+    };
+
+    private double? BearingErrorDegrees => RelativeBearingDegrees is double degrees
+        ? Math.Abs(NormalizeSignedDegrees(degrees))
+        : null;
+
     private string DistanceLabel => HuntMath.ToFriendlyDistance(DistanceMeters);
+
+    private static double NormalizeSignedDegrees(double degrees)
+    {
+        var normalized = degrees % 360d;
+
+        if (normalized > 180d)
+        {
+            normalized -= 360d;
+        }
+        else if (normalized < -180d)
+        {
+            normalized += 360d;
+        }
+
+        return normalized;
+    }
 }
