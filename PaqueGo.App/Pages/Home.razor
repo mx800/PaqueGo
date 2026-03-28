@@ -67,19 +67,8 @@
 	@if (showFinalVictorySequence)
 	{
 		<div class="final-overlay" aria-label="Celebration finale du tresor">
-			<div class="confetti-rain final-confetti-rain" aria-hidden="true">
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
+			<div class="final-victory-parade">
+				<VictoryCelebration />
 			</div>
 			<div class="final-overlay-shell">
 				<div class="final-overlay-stage" aria-hidden="true">
@@ -168,7 +157,7 @@
 					<div class="final-overlay-ribbon">Victoire de Paque</div>
 					<h2>Le coffre au tresor est ouvert</h2>
 					<p class="final-overlay-name">Tous les oeufs sont trouves</p>
-					<p>Le butin dore scintille au milieu du jardin. Confettis, pierres precieuses et oeufs colores celebrent la fin de la chasse.</p>
+					<p>Le butin dore scintille au milieu du jardin. Une pluie d'oeufs colores et des pierres precieuses celebrent la fin de la chasse.</p>
 					<div class="final-overlay-actions">
 						<MudButton Variant="Variant.Outlined"
 								   Color="Color.Warning"
@@ -252,19 +241,6 @@
 			</MudPaper>
 	</section>
 	</section>
-
-	@if (HuntService.IsCompleted && !showFinalVictorySequence)
-	{
-		<VictoryCelebration />
-		<div class="confetti-rain" aria-hidden="true">
-			<span></span>
-			<span></span>
-			<span></span>
-			<span></span>
-			<span></span>
-			<span></span>
-		</div>
-	}
 </div>
 
 @code {

@@ -14,7 +14,9 @@ window.paqueGo = (() => {
 
     let watchId = null;
     let orientationHandler = null;
+    let absoluteOrientationHandler = null;
     let hasOrientationHeading = false;
+    let hasAbsoluteOrientation = false;
 
     const normalizeDegrees = (degrees) => {
         const normalized = degrees % 360;
@@ -49,13 +51,13 @@ window.paqueGo = (() => {
         return true;
     };
 
-    const updateHeading = (event) => {
+    const applyOrientationEvent = (event) => {
         let heading = null;
 
         if (typeof event.webkitCompassHeading === "number") {
             heading = event.webkitCompassHeading;
         } else if (typeof event.alpha === "number") {
-            heading = 360 - event.alpha;
+            heading = normalizeDegrees(360 - event.alpha);
         }
 
         setHeading(heading, "orientation");
@@ -66,7 +68,26 @@ window.paqueGo = (() => {
             return;
         }
 
-        orientationHandler = updateHeading;
+        // Prefer deviceorientationabsolute (Android/Chrome) where alpha is referenced to magnetic north.
+        if ("ondeviceorientationabsolute" in window) {
+            absoluteOrientationHandler = (event) => {
+                hasAbsoluteOrientation = true;
+                applyOrientationEvent(event);
+            };
+            window.addEventListener("deviceorientationabsolute", absoluteOrientationHandler, true);
+        }
+
+        // Also listen to regular deviceorientation for iOS (webkitCompassHeading)
+        // and as fallback when absolute events report absolute === true.
+        orientationHandler = (event) => {
+            if (hasAbsoluteOrientation) {
+                return;
+            }
+
+            if (typeof event.webkitCompassHeading === "number" || event.absolute === true) {
+                applyOrientationEvent(event);
+            }
+        };
         window.addEventListener("deviceorientation", orientationHandler, true);
     };
 
@@ -105,6 +126,12 @@ window.paqueGo = (() => {
         }
 
         hasOrientationHeading = false;
+        hasAbsoluteOrientation = false;
+
+        if (absoluteOrientationHandler) {
+            window.removeEventListener("deviceorientationabsolute", absoluteOrientationHandler, true);
+            absoluteOrientationHandler = null;
+        }
 
         if (orientationHandler) {
             window.removeEventListener("deviceorientation", orientationHandler, true);

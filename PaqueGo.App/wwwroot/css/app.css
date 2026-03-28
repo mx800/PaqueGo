@@ -130,8 +130,7 @@ a {
 }
 
 .decor-garden,
-.sky-layer,
-.confetti-rain {
+.sky-layer {
     pointer-events: none;
 }
 
@@ -1207,58 +1206,6 @@ a {
     text-align: center;
 }
 
-.confetti-rain {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 3;
-    pointer-events: none;
-}
-
-.confetti-rain span {
-    position: absolute;
-    top: -10%;
-    width: 1rem;
-    height: 1.4rem;
-    border-radius: 0.7rem;
-    animation: confetti-fall 2.5s linear infinite;
-}
-
-.confetti-rain span:nth-child(1) {
-    left: 10%;
-    background: var(--pink);
-}
-
-.confetti-rain span:nth-child(2) {
-    left: 28%;
-    background: var(--yellow);
-    animation-delay: 0.4s;
-}
-
-.confetti-rain span:nth-child(3) {
-    left: 42%;
-    background: var(--mint);
-    animation-delay: 1s;
-}
-
-.confetti-rain span:nth-child(4) {
-    left: 58%;
-    background: var(--blue);
-    animation-delay: 1.3s;
-}
-
-.confetti-rain span:nth-child(5) {
-    left: 74%;
-    background: var(--coral);
-    animation-delay: 0.8s;
-}
-
-.confetti-rain span:nth-child(6) {
-    left: 90%;
-    background: var(--lavender);
-    animation-delay: 1.7s;
-}
-
 .victory-parade {
     position: absolute;
     inset: 0;
@@ -1652,8 +1599,12 @@ a {
     backdrop-filter: blur(18px) saturate(1.12);
 }
 
-.final-confetti-rain {
+.final-victory-parade {
+    position: absolute;
+    inset: 0;
     z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
 }
 
 .final-overlay-shell {
@@ -1934,75 +1885,6 @@ a {
     text-transform: uppercase;
     color: #85500f;
     animation: found-hint-blink 1.05s ease-in-out infinite;
-}
-
-.final-confetti-rain span {
-    top: -14%;
-    width: 0.9rem;
-    height: 1.8rem;
-    border-radius: 0.4rem;
-    opacity: 0.92;
-    animation-duration: 3.4s;
-}
-
-.final-confetti-rain span:nth-child(1) {
-    left: 4%;
-    animation-delay: 0s;
-}
-
-.final-confetti-rain span:nth-child(2) {
-    left: 12%;
-    animation-delay: 0.24s;
-}
-
-.final-confetti-rain span:nth-child(3) {
-    left: 20%;
-    animation-delay: 0.92s;
-}
-
-.final-confetti-rain span:nth-child(4) {
-    left: 28%;
-    animation-delay: 0.48s;
-}
-
-.final-confetti-rain span:nth-child(5) {
-    left: 36%;
-    animation-delay: 1.16s;
-}
-
-.final-confetti-rain span:nth-child(6) {
-    left: 44%;
-    animation-delay: 0.76s;
-}
-
-.final-confetti-rain span:nth-child(7) {
-    left: 52%;
-    animation-delay: 0.18s;
-}
-
-.final-confetti-rain span:nth-child(8) {
-    left: 61%;
-    animation-delay: 1.04s;
-}
-
-.final-confetti-rain span:nth-child(9) {
-    left: 70%;
-    animation-delay: 0.56s;
-}
-
-.final-confetti-rain span:nth-child(10) {
-    left: 78%;
-    animation-delay: 1.3s;
-}
-
-.final-confetti-rain span:nth-child(11) {
-    left: 86%;
-    animation-delay: 0.34s;
-}
-
-.final-confetti-rain span:nth-child(12) {
-    left: 94%;
-    animation-delay: 1.48s;
 }
 
 .found-overlay-shell {
