@@ -992,6 +992,16 @@ a {
     margin-bottom: 1rem;
 }
 
+.compass-ring,
+.orbit,
+.pointer-head,
+.pointer-tail,
+.distance-value,
+.proximity-status,
+.heat-indicator {
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background 220ms ease, color 220ms ease, filter 220ms ease;
+}
+
 .orbit,
 .compass-star {
     position: absolute;
@@ -1042,6 +1052,61 @@ a {
         linear-gradient(135deg, rgba(255, 216, 107, 0.4) 0%, rgba(255, 143, 180, 0.45) 100%);
     border: 16px solid rgba(255, 255, 255, 0.55);
     box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.45), 0 28px 50px rgba(184, 113, 143, 0.2);
+}
+
+.compass-shell.heat-cold .compass-ring {
+    box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.36), 0 18px 42px rgba(108, 174, 237, 0.18);
+}
+
+.compass-shell.heat-cold .orbit {
+    border-color: rgba(113, 190, 255, 0.4);
+}
+
+.compass-shell.heat-warm .compass-ring {
+    animation: proximity-ring-breathe 1.8s ease-in-out infinite;
+    box-shadow: inset 0 0 0 8px rgba(255, 248, 219, 0.5), 0 20px 48px rgba(255, 196, 87, 0.28), 0 0 30px rgba(255, 227, 145, 0.28);
+}
+
+.compass-shell.heat-warm .orbit {
+    border-color: rgba(255, 212, 92, 0.5);
+}
+
+.compass-shell.heat-warm .orbit-one {
+    animation-duration: 6.2s;
+}
+
+.compass-shell.heat-warm .orbit-two {
+    animation-duration: 4.2s;
+}
+
+.compass-shell.heat-hot .compass-ring {
+    animation: target-lock-surge 0.92s ease-in-out infinite;
+    box-shadow: inset 0 0 0 8px rgba(255, 236, 236, 0.52), 0 22px 52px rgba(255, 118, 118, 0.36), 0 0 46px rgba(255, 132, 124, 0.42);
+}
+
+.compass-shell.heat-hot .orbit {
+    border-color: rgba(255, 142, 118, 0.62);
+}
+
+.compass-shell.heat-hot .orbit-one {
+    animation-duration: 4.6s;
+}
+
+.compass-shell.heat-hot .orbit-two {
+    animation-duration: 3.1s;
+}
+
+.compass-shell.heat-warm .pointer-head {
+    filter: drop-shadow(0 0 20px rgba(255, 195, 82, 0.4));
+}
+
+.compass-shell.heat-hot .pointer-head {
+    border-bottom-color: #ff6f7f;
+    filter: drop-shadow(0 0 22px rgba(255, 100, 115, 0.58));
+}
+
+.compass-shell.heat-hot .pointer-tail {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 114, 114, 0.88) 100%);
 }
 
 .cardinal {
@@ -1130,7 +1195,9 @@ a {
     grid-template-columns: auto 1fr;
     gap: 1rem;
     align-items: center;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    box-shadow: 0 14px 30px rgba(151, 120, 137, 0.1);
     border-radius: var(--radius-lg);
     padding: 1rem;
 }
@@ -1152,18 +1219,22 @@ a {
 
 .heat-light.active {
     transform: scale(1.15);
+    animation: heat-light-pop 0.8s ease-in-out infinite;
 }
 
 .heat-cold .heat-light.active {
     background: var(--blue);
+    box-shadow: 0 0 16px rgba(90, 176, 248, 0.34);
 }
 
 .heat-warm .heat-light.active {
     background: var(--yellow);
+    box-shadow: 0 0 18px rgba(255, 202, 87, 0.38);
 }
 
 .heat-hot .heat-light.active {
     background: var(--coral);
+    box-shadow: 0 0 22px rgba(255, 117, 117, 0.44);
 }
 
 .heat-copy {
@@ -1493,13 +1564,11 @@ a {
     align-content: start;
     gap: 1rem;
     padding: 1.4rem;
-    background:
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.28) 36%, rgba(255, 250, 239, 0.12) 100%),
-        linear-gradient(180deg, rgba(165, 220, 255, 0.1) 0%, rgba(255, 216, 107, 0.08) 100%) !important;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-color: rgba(255, 255, 255, 0.38);
-    box-shadow: 0 24px 54px rgba(174, 118, 118, 0.12);
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: transparent;
+    box-shadow: none;
 }
 
 .play-layout {
@@ -1532,6 +1601,60 @@ a {
 
 .distance-value {
     color: var(--pink-dark) !important;
+}
+
+.hunt-screen.heat-cold .distance-value {
+    color: #4297d8 !important;
+    text-shadow: 0 0 14px rgba(114, 190, 255, 0.18);
+}
+
+.hunt-screen.heat-warm .distance-value {
+    color: #e6a824 !important;
+    text-shadow: 0 0 18px rgba(255, 205, 95, 0.34);
+}
+
+.hunt-screen.heat-hot .distance-value {
+    color: #ff6d77 !important;
+    text-shadow: 0 0 24px rgba(255, 109, 119, 0.46);
+    transform: scale(1.05);
+}
+
+.proximity-status {
+    display: grid;
+    gap: 0.18rem;
+    justify-items: center;
+    text-align: center;
+    padding: 0.9rem 1rem;
+    border-radius: 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    background: rgba(255, 255, 255, 0.26);
+}
+
+.proximity-title {
+    margin: 0;
+}
+
+.proximity-message {
+    max-width: 42rem;
+    line-height: 1.45;
+}
+
+.proximity-status.heat-cold {
+    background: linear-gradient(180deg, rgba(162, 218, 255, 0.22) 0%, rgba(255, 255, 255, 0.18) 100%);
+    box-shadow: 0 10px 28px rgba(115, 182, 243, 0.12);
+    animation: proximity-ring-breathe 3.8s ease-in-out infinite;
+}
+
+.proximity-status.heat-warm {
+    background: linear-gradient(180deg, rgba(255, 230, 163, 0.28) 0%, rgba(255, 255, 255, 0.18) 100%);
+    box-shadow: 0 12px 30px rgba(255, 193, 76, 0.16);
+    animation: proximity-ring-breathe 2.7s ease-in-out infinite;
+}
+
+.proximity-status.heat-hot {
+    background: linear-gradient(180deg, rgba(255, 177, 177, 0.32) 0%, rgba(255, 240, 232, 0.18) 100%);
+    box-shadow: 0 14px 34px rgba(255, 111, 111, 0.2);
+    animation: target-lock-surge 1.45s ease-in-out infinite;
 }
 
 .compass-footer-actions {
@@ -2672,6 +2795,50 @@ a {
     }
 }
 
+@keyframes proximity-ring-breathe {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 12px 26px rgba(151, 120, 137, 0.12);
+    }
+
+    50% {
+        transform: translateY(-2px) scale(1.015);
+        box-shadow: 0 18px 34px rgba(151, 120, 137, 0.18);
+    }
+}
+
+@keyframes target-lock-surge {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 14px 34px rgba(255, 111, 111, 0.18);
+    }
+
+    50% {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 20px 40px rgba(255, 111, 111, 0.3);
+    }
+}
+
+@keyframes heat-light-pop {
+    0%,
+    100% {
+        transform: scale(1.05);
+        filter: brightness(1);
+    }
+
+    45% {
+        transform: scale(1.22);
+        filter: brightness(1.08);
+    }
+
+    70% {
+        transform: scale(1.12);
+        filter: brightness(1.02);
+    }
+}
+
 @media (max-width: 960px) {
     .hero-card,
     .settings-hero,
@@ -2799,14 +2966,12 @@ a {
 }
 
 .mud-shell-card.immersive-compass-card {
-    background-color: rgba(255, 255, 255, 0.18) !important;
-    background-image:
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.2) 34%, rgba(255, 250, 239, 0.06) 100%),
-        linear-gradient(180deg, rgba(165, 220, 255, 0.08) 0%, rgba(255, 216, 107, 0.06) 100%) !important;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
-    box-shadow: 0 24px 54px rgba(174, 118, 118, 0.1) !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none !important;
 }
 
 .mud-message,

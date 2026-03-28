@@ -49,6 +49,28 @@ window.paqueGo = (() => {
         return normalized < 0 ? normalized + 360 : normalized;
     };
 
+    const updateCompassNeedle = () => {
+        const needle = document.getElementById("compass-pointer");
+
+        if (!needle) {
+            return;
+        }
+
+        if (targetBearingDegrees === null) {
+            needle.style.transform = "rotate(0deg)";
+            return;
+        }
+
+        let rotation = targetBearingDegrees;
+
+        if (state.isHeadingAvailable && typeof state.headingDegrees === "number") {
+            const delta = normalizeDegrees(targetBearingDegrees - state.headingDegrees);
+            rotation = delta > 180 ? delta - 360 : delta;
+        }
+
+        needle.style.transform = `rotate(${rotation.toFixed(1)}deg)`;
+    };
+
     const getAudioContextCtor = () => window.AudioContext || window.webkitAudioContext;
 
     const disconnectNode = (node) => {
@@ -532,9 +554,9 @@ window.paqueGo = (() => {
         }
 
         const heatProfiles = {
-            Cold: { frequency: 196, type: "sine", intervalMs: 1700, volume: 0.026 },
-            Warm: { frequency: 311.13, type: "triangle", intervalMs: 980, volume: 0.04 },
-            Hot: { frequency: 493.88, type: "square", intervalMs: 520, volume: 0.062 }
+            Cold: { baseFrequency: 196, accentFrequency: null, sparkleFrequency: null, type: "sine", intervalMs: 1500, volume: 0.036 },
+            Warm: { baseFrequency: 392, accentFrequency: 523.25, sparkleFrequency: null, type: "triangle", intervalMs: 720, volume: 0.058 },
+            Hot: { baseFrequency: 523.25, accentFrequency: 783.99, sparkleFrequency: 1046.5, type: "square", intervalMs: 320, volume: 0.085 }
         };
 
         const profile = heatProfiles[audio.currentHeatLevel];
@@ -544,12 +566,34 @@ window.paqueGo = (() => {
         }
 
         await playTone({
-            frequency: profile.frequency,
+            frequency: profile.baseFrequency,
             type: profile.type,
-            duration: 0.08,
-            release: 0.12,
+            duration: 0.09,
+            release: 0.13,
             volume: profile.volume
         });
+
+        if (profile.accentFrequency) {
+            await playTone({
+                frequency: profile.accentFrequency,
+                type: "triangle",
+                duration: 0.08,
+                release: 0.12,
+                volume: profile.volume * 0.86,
+                when: 0.08
+            });
+        }
+
+        if (profile.sparkleFrequency) {
+            await playTone({
+                frequency: profile.sparkleFrequency,
+                type: "sine",
+                duration: 0.07,
+                release: 0.1,
+                volume: profile.volume * 0.78,
+                when: 0.16
+            });
+        }
 
         audio.heatPulseTimeoutId = window.setTimeout(() => {
             void scheduleHeatPulse();
@@ -748,6 +792,7 @@ window.paqueGo = (() => {
             state.orientationError = null;
         }
 
+        updateCompassNeedle();
         pushHeadingToDotNet();
         return true;
     };
@@ -874,6 +919,7 @@ window.paqueGo = (() => {
             ? normalizeDegrees(bearingDegrees)
             : null;
 
+        updateCompassNeedle();
         return targetBearingDegrees;
     };
 

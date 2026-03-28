@@ -208,7 +208,11 @@
 					<MudText Typo="Typo.h4" Class="distance-value">@DistanceLabel</MudText>
 				</div>
 
-			<HeatIndicator Level="@HuntService.HeatLevel" DistanceMeters="@HuntService.DistanceToTargetMeters" />
+				<div class="proximity-status heat-@HuntService.HeatLevel.ToString().ToLowerInvariant()">
+					<MudText Typo="Typo.overline" Class="section-label mud-overline">Signal de piste</MudText>
+					<MudText Typo="Typo.h6" Class="proximity-title">@HuntService.HeatLevelLabel</MudText>
+					<MudText Typo="Typo.body2" Class="proximity-message">@HuntService.PlayerMessage</MudText>
+				</div>
 
 				@if (!string.IsNullOrWhiteSpace(HuntService.ActiveTarget?.Hint))
 				{

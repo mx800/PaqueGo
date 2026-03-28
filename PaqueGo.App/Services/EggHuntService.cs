@@ -603,9 +603,9 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
 
         return HeatLevel switch
         {
-            HeatLevel.Hot => "Chaud ! L'oeuf est juste à côté de toi.",
-            HeatLevel.Warm => "Tiède ! Continue dans cette direction.",
-            HeatLevel.Cold => "Froid, avance encore vers la flèche.",
+            HeatLevel.Hot => "Tu brules ! L'oeuf est juste a cote de toi. Regarde tout pres.",
+            HeatLevel.Warm => "Ca chauffe ! Continue dans cette direction, tu t'en rapproches.",
+            HeatLevel.Cold => "Encore loin, mais la piste est bonne. Suis la fleche.",
             _ => "La boussole cherche encore le meilleur chemin."
         };
     }
