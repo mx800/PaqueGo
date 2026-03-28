@@ -1212,6 +1212,7 @@ a {
     inset: 0;
     overflow: hidden;
     z-index: 3;
+    pointer-events: none;
 }
 
 .confetti-rain span {
@@ -1637,6 +1638,373 @@ a {
     outline-offset: -0.35rem;
 }
 
+.final-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 7;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 24%, rgba(255, 250, 214, 0.95) 0%, rgba(255, 216, 107, 0.58) 18%, rgba(255, 143, 180, 0.26) 52%, rgba(255, 143, 180, 0.06) 72%, rgba(255, 255, 255, 0) 100%),
+        linear-gradient(180deg, rgba(80, 41, 94, 0.14) 0%, rgba(255, 143, 180, 0.24) 100%);
+    backdrop-filter: blur(18px) saturate(1.12);
+}
+
+.final-confetti-rain {
+    z-index: 0;
+}
+
+.final-overlay-shell {
+    width: min(42rem, 100%);
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 1.25rem;
+    justify-items: center;
+}
+
+.final-overlay-stage {
+    position: relative;
+    width: min(26rem, 88vw);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    animation: final-stage-rise 320ms ease-out;
+}
+
+.final-beam,
+.final-glitter,
+.final-core-glow,
+.final-treasure-svg,
+.final-overlay-eggs {
+    position: absolute;
+}
+
+.final-beam {
+    left: 50%;
+    top: 50%;
+    width: 1.2rem;
+    height: 11rem;
+    margin-left: -0.6rem;
+    margin-top: -5.5rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 248, 196, 0.96) 42%, rgba(255, 255, 255, 0) 100%);
+    opacity: 0.84;
+    transform-origin: center center;
+    animation: final-beam-pulse 1.35s ease-in-out infinite;
+}
+
+.final-beam.beam-one {
+    transform: rotate(0deg);
+}
+
+.final-beam.beam-two {
+    transform: rotate(30deg);
+    animation-delay: 0.08s;
+}
+
+.final-beam.beam-three {
+    transform: rotate(60deg);
+    animation-delay: 0.16s;
+}
+
+.final-beam.beam-four {
+    transform: rotate(90deg);
+    animation-delay: 0.24s;
+}
+
+.final-beam.beam-five {
+    transform: rotate(120deg);
+    animation-delay: 0.32s;
+}
+
+.final-beam.beam-six {
+    transform: rotate(150deg);
+    animation-delay: 0.4s;
+}
+
+.final-glitter {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #fff1a6 48%, rgba(255, 216, 107, 0) 74%);
+    box-shadow: 0 0 26px rgba(255, 255, 255, 0.72);
+    animation: final-glitter-pop 1.15s ease-in-out infinite;
+}
+
+.glitter-one {
+    top: 12%;
+    left: 22%;
+}
+
+.glitter-two {
+    top: 18%;
+    right: 18%;
+    animation-delay: 0.12s;
+}
+
+.glitter-three {
+    top: 44%;
+    left: 6%;
+    animation-delay: 0.26s;
+}
+
+.glitter-four {
+    top: 40%;
+    right: 8%;
+    animation-delay: 0.38s;
+}
+
+.glitter-five {
+    bottom: 12%;
+    left: 24%;
+    animation-delay: 0.18s;
+}
+
+.glitter-six {
+    bottom: 16%;
+    right: 22%;
+    animation-delay: 0.3s;
+}
+
+.final-core-glow {
+    inset: 18%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 247, 196, 0.98) 34%, rgba(255, 216, 107, 0.78) 58%, rgba(255, 216, 107, 0) 100%);
+    box-shadow:
+        0 0 0 0 rgba(255, 216, 107, 0.2),
+        0 0 58px rgba(255, 255, 255, 0.88),
+        0 0 86px rgba(255, 143, 180, 0.28);
+    animation: final-core-pulse 1.28s ease-in-out infinite;
+}
+
+.final-treasure-svg {
+    inset: 0;
+    margin: auto;
+    width: min(18rem, 66vw);
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 24px 34px rgba(119, 68, 13, 0.24));
+    animation: final-trophy-bob 1.2s ease-in-out infinite;
+}
+
+.final-treasure-svg .treasure-floor-shadow {
+    fill: rgba(116, 64, 15, 0.2);
+}
+
+.final-treasure-svg .treasure-coin {
+    fill: url(#treasureGoldGradient);
+    stroke: rgba(255, 244, 193, 0.95);
+    stroke-width: 4;
+    animation: final-coin-bounce 1.5s ease-in-out infinite;
+}
+
+.final-treasure-svg .coin-b,
+.final-treasure-svg .coin-f {
+    animation-delay: 0.12s;
+}
+
+.final-treasure-svg .coin-c,
+.final-treasure-svg .coin-g {
+    animation-delay: 0.24s;
+}
+
+.final-treasure-svg .coin-d,
+.final-treasure-svg .coin-h {
+    animation-delay: 0.36s;
+}
+
+.final-treasure-svg .treasure-gem {
+    stroke: rgba(255, 255, 255, 0.64);
+    stroke-width: 3;
+    animation: final-gem-twinkle 1.35s ease-in-out infinite;
+}
+
+.final-treasure-svg .gem-a {
+    fill: #ff8fb4;
+}
+
+.final-treasure-svg .gem-b {
+    fill: #8fe1ff;
+    animation-delay: 0.16s;
+}
+
+.final-treasure-svg .gem-c {
+    fill: #8fe5b8;
+    animation-delay: 0.28s;
+}
+
+.final-treasure-svg .treasure-lid {
+    transform-origin: 160px 104px;
+    animation: final-lid-sway 1.6s ease-in-out infinite;
+}
+
+.final-overlay-eggs {
+    inset: 0;
+}
+
+.final-egg {
+    position: absolute;
+    width: 3.6rem;
+    height: 4.9rem;
+    border-radius: 55% 55% 50% 50%;
+    box-shadow: inset 0 -0.7rem 0 rgba(255, 255, 255, 0.24), 0 12px 24px rgba(180, 118, 130, 0.18);
+    animation: final-egg-drift 1.8s ease-in-out infinite;
+}
+
+.final-egg-one {
+    left: 12%;
+    bottom: 18%;
+    background: linear-gradient(180deg, var(--pink) 0%, #ffc4d9 100%);
+}
+
+.final-egg-two {
+    right: 14%;
+    top: 18%;
+    background: linear-gradient(180deg, var(--yellow) 0%, #fff0a5 100%);
+    animation-delay: 0.28s;
+}
+
+.final-egg-three {
+    right: 18%;
+    bottom: 10%;
+    background: linear-gradient(180deg, var(--mint) 0%, #d2f8e5 100%);
+    animation-delay: 0.54s;
+}
+
+.final-overlay-card {
+    width: min(34rem, 100%);
+    padding: 1.45rem 1.25rem 1.2rem;
+    text-align: center;
+    border-radius: calc(var(--radius-lg) + 0.3rem);
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 249, 230, 0.95) 100%);
+    box-shadow: 0 32px 78px rgba(184, 113, 143, 0.22);
+    animation: transition-pop 260ms ease-out;
+}
+
+.final-overlay-ribbon {
+    display: inline-flex;
+    padding: 0.48rem 0.92rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 230, 132, 1) 0%, rgba(255, 197, 92, 0.98) 100%);
+    color: #85500f;
+    font-family: "Fredoka", "Segoe UI", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+}
+
+.final-overlay-card h2 {
+    margin: 0.7rem 0 0.35rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+}
+
+.final-overlay-name {
+    margin: 0;
+    font-family: "Fredoka", "Segoe UI", sans-serif;
+    font-size: clamp(1.05rem, 4vw, 1.35rem);
+    color: #b6672f;
+}
+
+.final-overlay-actions,
+.celebration-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.final-overlay-actions {
+    margin-top: 1rem;
+}
+
+.celebration-actions {
+    margin-top: 0.9rem;
+}
+
+.final-overlay-hint {
+    margin-top: 0.9rem !important;
+    font-family: "Fredoka", "Segoe UI", sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #85500f;
+    animation: found-hint-blink 1.05s ease-in-out infinite;
+}
+
+.final-confetti-rain span {
+    top: -14%;
+    width: 0.9rem;
+    height: 1.8rem;
+    border-radius: 0.4rem;
+    opacity: 0.92;
+    animation-duration: 3.4s;
+}
+
+.final-confetti-rain span:nth-child(1) {
+    left: 4%;
+    animation-delay: 0s;
+}
+
+.final-confetti-rain span:nth-child(2) {
+    left: 12%;
+    animation-delay: 0.24s;
+}
+
+.final-confetti-rain span:nth-child(3) {
+    left: 20%;
+    animation-delay: 0.92s;
+}
+
+.final-confetti-rain span:nth-child(4) {
+    left: 28%;
+    animation-delay: 0.48s;
+}
+
+.final-confetti-rain span:nth-child(5) {
+    left: 36%;
+    animation-delay: 1.16s;
+}
+
+.final-confetti-rain span:nth-child(6) {
+    left: 44%;
+    animation-delay: 0.76s;
+}
+
+.final-confetti-rain span:nth-child(7) {
+    left: 52%;
+    animation-delay: 0.18s;
+}
+
+.final-confetti-rain span:nth-child(8) {
+    left: 61%;
+    animation-delay: 1.04s;
+}
+
+.final-confetti-rain span:nth-child(9) {
+    left: 70%;
+    animation-delay: 0.56s;
+}
+
+.final-confetti-rain span:nth-child(10) {
+    left: 78%;
+    animation-delay: 1.3s;
+}
+
+.final-confetti-rain span:nth-child(11) {
+    left: 86%;
+    animation-delay: 0.34s;
+}
+
+.final-confetti-rain span:nth-child(12) {
+    left: 94%;
+    animation-delay: 1.48s;
+}
+
 .found-overlay-shell {
     width: min(32rem, 100%);
     display: grid;
@@ -2048,7 +2416,32 @@ a {
     }
 }
 
+@keyframes final-stage-rise {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 @keyframes found-ray-pulse {
+    0%,
+    100% {
+        opacity: 0.46;
+        filter: blur(1px);
+    }
+
+    50% {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+@keyframes final-beam-pulse {
     0%,
     100% {
         opacity: 0.46;
@@ -2080,6 +2473,25 @@ a {
     }
 }
 
+@keyframes final-core-pulse {
+    0%,
+    100% {
+        transform: scale(0.96);
+        box-shadow:
+            0 0 0 0 rgba(255, 216, 107, 0.22),
+            0 0 58px rgba(255, 255, 255, 0.88),
+            0 0 86px rgba(255, 143, 180, 0.22);
+    }
+
+    50% {
+        transform: scale(1.08);
+        box-shadow:
+            0 0 0 26px rgba(255, 216, 107, 0.08),
+            0 0 68px rgba(255, 255, 255, 0.98),
+            0 0 100px rgba(255, 143, 180, 0.34);
+    }
+}
+
 @keyframes found-egg-float {
     0%,
     100% {
@@ -2088,6 +2500,52 @@ a {
 
     50% {
         transform: translateY(-12px) scale(1.03) rotate(2deg);
+    }
+}
+
+@keyframes final-trophy-bob {
+    0%,
+    100% {
+        transform: translateY(-2px) scale(1) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-12px) scale(1.04) rotate(2deg);
+    }
+}
+
+@keyframes final-lid-sway {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(-4deg);
+    }
+}
+
+@keyframes final-coin-bounce {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-6px) scale(1.04);
+    }
+}
+
+@keyframes final-gem-twinkle {
+    0%,
+    100% {
+        opacity: 0.78;
+        filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+    }
+
+    50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.55));
     }
 }
 
@@ -2101,6 +2559,30 @@ a {
     50% {
         opacity: 1;
         transform: scale(1.28);
+    }
+}
+
+@keyframes final-glitter-pop {
+    0%,
+    100% {
+        opacity: 0.38;
+        transform: scale(0.72);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.34);
+    }
+}
+
+@keyframes final-egg-drift {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate3d(0, -14px, 0) rotate(6deg);
     }
 }
 
@@ -2122,13 +2604,36 @@ a {
         gap: 0.95rem;
     }
 
+    .final-overlay-shell {
+        gap: 1rem;
+    }
+
     .found-overlay-card {
         padding: 1.15rem 1rem 1rem;
+    }
+
+    .final-overlay-card {
+        padding: 1.15rem 1rem 1rem;
+    }
+
+    .final-overlay-actions,
+    .celebration-actions {
+        display: grid;
+        width: 100%;
+    }
+
+    .final-treasure-svg {
+        width: min(15rem, 72vw);
     }
 
     .found-ray {
         height: 6.6rem;
         margin-top: -3.3rem;
+    }
+
+    .final-beam {
+        height: 8.8rem;
+        margin-top: -4.4rem;
     }
 }
 
@@ -2139,7 +2644,18 @@ a {
     .found-core-glow,
     .found-egg-mark,
     .found-overlay-card,
-    .found-overlay-hint {
+    .found-overlay-hint,
+    .final-overlay-stage,
+    .final-beam,
+    .final-glitter,
+    .final-core-glow,
+    .final-treasure-svg,
+    .final-treasure-svg .treasure-coin,
+    .final-treasure-svg .treasure-gem,
+    .final-treasure-svg .treasure-lid,
+    .final-egg,
+    .final-overlay-card,
+    .final-overlay-hint {
         animation: none !important;
     }
 }

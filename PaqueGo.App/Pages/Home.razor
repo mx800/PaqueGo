@@ -64,6 +64,125 @@
 		</div>
 	}
 
+	@if (showFinalVictorySequence)
+	{
+		<div class="final-overlay" aria-label="Celebration finale du tresor">
+			<div class="confetti-rain final-confetti-rain" aria-hidden="true">
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+			<div class="final-overlay-shell">
+				<div class="final-overlay-stage" aria-hidden="true">
+					<span class="final-beam beam-one"></span>
+					<span class="final-beam beam-two"></span>
+					<span class="final-beam beam-three"></span>
+					<span class="final-beam beam-four"></span>
+					<span class="final-beam beam-five"></span>
+					<span class="final-beam beam-six"></span>
+					<span class="final-glitter glitter-one"></span>
+					<span class="final-glitter glitter-two"></span>
+					<span class="final-glitter glitter-three"></span>
+					<span class="final-glitter glitter-four"></span>
+					<span class="final-glitter glitter-five"></span>
+					<span class="final-glitter glitter-six"></span>
+					<div class="final-core-glow"></div>
+					<svg class="final-treasure-svg" viewBox="0 0 320 280" role="presentation">
+						<defs>
+							<linearGradient id="treasureLidGradient" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="0%" stop-color="#7a4619" />
+								<stop offset="100%" stop-color="#4d2708" />
+							</linearGradient>
+							<linearGradient id="treasureWoodGradient" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="0%" stop-color="#a96324" />
+								<stop offset="100%" stop-color="#71370f" />
+							</linearGradient>
+							<linearGradient id="treasureGoldGradient" x1="0" y1="0" x2="1" y2="1">
+								<stop offset="0%" stop-color="#fff3ae" />
+								<stop offset="55%" stop-color="#ffd24f" />
+								<stop offset="100%" stop-color="#ffb326" />
+							</linearGradient>
+							<radialGradient id="treasureGlowGradient" cx="50%" cy="40%" r="65%">
+								<stop offset="0%" stop-color="rgba(255,250,214,0.98)" />
+								<stop offset="65%" stop-color="rgba(255,216,107,0.55)" />
+								<stop offset="100%" stop-color="rgba(255,216,107,0)" />
+							</radialGradient>
+						</defs>
+
+						<ellipse class="treasure-floor-shadow" cx="160" cy="244" rx="106" ry="24" />
+						<ellipse class="treasure-inner-glow" cx="160" cy="120" rx="110" ry="84" fill="url(#treasureGlowGradient)" />
+
+						<g class="treasure-coins-back">
+							<circle class="treasure-coin coin-a" cx="110" cy="134" r="18" />
+							<circle class="treasure-coin coin-b" cx="138" cy="120" r="20" />
+							<circle class="treasure-coin coin-c" cx="182" cy="118" r="19" />
+							<circle class="treasure-coin coin-d" cx="212" cy="134" r="17" />
+						</g>
+
+						<g class="treasure-lid">
+							<path d="M82 72C82 50 99 34 122 34H198C221 34 238 50 238 72V92H82V72Z" fill="url(#treasureLidGradient)" />
+							<path d="M72 92C72 66 92 48 118 48H202C228 48 248 66 248 92V112H72V92Z" fill="url(#treasureWoodGradient)" />
+							<path d="M88 92C88 71 104 58 124 58H196C216 58 232 71 232 92V102H88V92Z" fill="#ffdf6f" opacity="0.72" />
+							<rect x="72" y="94" width="176" height="16" rx="8" fill="url(#treasureGoldGradient)" />
+							<rect x="150" y="74" width="20" height="38" rx="10" fill="url(#treasureGoldGradient)" />
+						</g>
+
+						<g class="treasure-box">
+							<rect x="74" y="112" width="172" height="112" rx="24" fill="url(#treasureWoodGradient)" />
+							<rect x="86" y="126" width="148" height="84" rx="18" fill="#8f4f1b" opacity="0.82" />
+							<rect x="74" y="130" width="172" height="18" rx="9" fill="url(#treasureGoldGradient)" />
+							<rect x="74" y="170" width="172" height="18" rx="9" fill="url(#treasureGoldGradient)" />
+							<rect x="108" y="112" width="18" height="112" rx="9" fill="url(#treasureGoldGradient)" />
+							<rect x="194" y="112" width="18" height="112" rx="9" fill="url(#treasureGoldGradient)" />
+							<rect x="144" y="144" width="32" height="46" rx="14" fill="url(#treasureGoldGradient)" />
+							<circle cx="160" cy="164" r="7" fill="#8a5310" />
+						</g>
+
+						<g class="treasure-coins-front">
+							<circle class="treasure-coin coin-e" cx="116" cy="164" r="18" />
+							<circle class="treasure-coin coin-f" cx="144" cy="150" r="18" />
+							<circle class="treasure-coin coin-g" cx="174" cy="150" r="18" />
+							<circle class="treasure-coin coin-h" cx="202" cy="164" r="17" />
+							<path class="treasure-gem gem-a" d="M114 196l14-20 14 20-14 18-14-18Z" />
+							<path class="treasure-gem gem-b" d="M186 192l12-16 12 16-12 18-12-18Z" />
+							<path class="treasure-gem gem-c" d="M154 202l10-14 10 14-10 16-10-16Z" />
+						</g>
+					</svg>
+					<div class="final-overlay-eggs">
+						<span class="final-egg final-egg-one"></span>
+						<span class="final-egg final-egg-two"></span>
+						<span class="final-egg final-egg-three"></span>
+					</div>
+				</div>
+
+				<div class="final-overlay-card">
+					<div class="final-overlay-ribbon">Victoire de Paque</div>
+					<h2>Le coffre au tresor est ouvert</h2>
+					<p class="final-overlay-name">Tous les oeufs sont trouves</p>
+					<p>Le butin dore scintille au milieu du jardin. Confettis, pierres precieuses et oeufs colores celebrent la fin de la chasse.</p>
+					<div class="final-overlay-actions">
+						<MudButton Variant="Variant.Outlined"
+								   Color="Color.Warning"
+								   StartIcon="@Icons.Material.Filled.RestartAlt"
+								   OnClick="@RestartAdventureAsync">
+							Recommencer
+						</MudButton>
+					</div>
+					<p class="final-overlay-hint">Choisis la suite depuis cette carte</p>
+				</div>
+			</div>
+		</div>
+	}
+
 	<section class="play-stage">
 		<section class="play-layout">
 			<MudPaper Class="game-card compass-card immersive-compass-card mud-shell-card" Elevation="0">
@@ -121,19 +240,20 @@
 
 				@if (HuntService.IsCompleted)
 				{
-					<MudAlert Severity="Severity.Success"
-							  Variant="Variant.Filled"
-							  Dense="true"
-							  Class="celebration-box">
-						<MudText Typo="Typo.h6">Bravo, tous les oeufs sont trouvés !</MudText>
-						<MudText Typo="Typo.body2">Le lapin de Pâque saute de joie.</MudText>
-					</MudAlert>
+					<div class="celebration-actions">
+						<MudButton Variant="Variant.Outlined"
+								   Color="Color.Warning"
+								   StartIcon="@Icons.Material.Filled.RestartAlt"
+								   OnClick="@RestartAdventureAsync">
+							Recommencer depuis l'accueil
+						</MudButton>
+					</div>
 				}
 			</MudPaper>
 	</section>
 	</section>
 
-	@if (HuntService.IsCompleted)
+	@if (HuntService.IsCompleted && !showFinalVictorySequence)
 	{
 		<VictoryCelebration />
 		<div class="confetti-rain" aria-hidden="true">
@@ -152,8 +272,10 @@
 	private readonly CancellationTokenSource _refreshCts = new();
 	private bool showTransition = true;
 	private bool showEggFoundSequence;
+	private bool showFinalVictorySequence;
 	private bool isFindingEgg;
 	private bool isCompletingEggFoundSequence;
+	private bool isPendingFinalEgg;
 	private string foundSequenceRibbon = "Oeuf trouve";
 	private string foundSequenceTitle = string.Empty;
 	private string foundSequenceMessage = string.Empty;
@@ -237,6 +359,7 @@
 			: HuntService.ActiveTarget.Name;
 		pendingFoundTargetId = HuntService.ActiveTarget.Id;
 		var isFinalEgg = HuntService.FoundCount + 1 >= HuntService.TotalCount;
+		isPendingFinalEgg = isFinalEgg;
 
 		foundSequenceRibbon = isFinalEgg ? "Dernier oeuf" : "Oeuf trouve";
 		foundSequenceTitle = isFinalEgg ? "Le panier s'illumine" : "Une etincelle traverse le jardin";
@@ -258,10 +381,12 @@
 		}
 
 		isCompletingEggFoundSequence = true;
+		var shouldShowFinalVictory = false;
 
 		try
 		{
 			await HuntService.MarkTargetFoundAsync(pendingFoundTargetId);
+			shouldShowFinalVictory = isPendingFinalEgg && HuntService.IsCompleted;
 		}
 		catch (Exception exception)
 		{
@@ -270,10 +395,12 @@
 		finally
 		{
 			showEggFoundSequence = false;
-			isFindingEgg = false;
 			isCompletingEggFoundSequence = false;
+			showFinalVictorySequence = shouldShowFinalVictory;
+			isFindingEgg = shouldShowFinalVictory;
 			foundSequenceEggName = null;
 			pendingFoundTargetId = null;
+			isPendingFinalEgg = false;
 			await InvokeAsync(StateHasChanged);
 		}
 	}
@@ -286,6 +413,41 @@
 		}
 
 		return Task.CompletedTask;
+	}
+
+	private async Task CloseFinalVictorySequenceAsync()
+	{
+		if (!showFinalVictorySequence)
+		{
+			return;
+		}
+
+		showFinalVictorySequence = false;
+		isFindingEgg = false;
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private async Task RestartAdventureAsync()
+	{
+		try
+		{
+			showEggFoundSequence = false;
+			showFinalVictorySequence = false;
+			isFindingEgg = false;
+			isCompletingEggFoundSequence = false;
+			isPendingFinalEgg = false;
+			foundSequenceEggName = null;
+			pendingFoundTargetId = null;
+			runtimeMessage = null;
+
+			await HuntService.ResetProgressAsync();
+			Navigation.NavigateTo(string.Empty, replace: true);
+		}
+		catch (Exception exception)
+		{
+			runtimeMessage = $"Impossible de recommencer la chasse : {exception.Message}";
+			await InvokeAsync(StateHasChanged);
+		}
 	}
 
 	public void Dispose()

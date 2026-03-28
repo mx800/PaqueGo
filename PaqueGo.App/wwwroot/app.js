@@ -14,10 +14,39 @@ window.paqueGo = (() => {
 
     let watchId = null;
     let orientationHandler = null;
+    let hasOrientationHeading = false;
 
     const normalizeDegrees = (degrees) => {
         const normalized = degrees % 360;
         return normalized < 0 ? normalized + 360 : normalized;
+    };
+
+    const setHeading = (heading, source) => {
+        if (typeof heading !== "number" || Number.isNaN(heading)) {
+            if (source === "orientation" && hasOrientationHeading) {
+                hasOrientationHeading = false;
+            }
+
+            if (!hasOrientationHeading && source === "orientation") {
+                state.isHeadingAvailable = false;
+            }
+
+            return false;
+        }
+
+        if (source === "geolocation" && hasOrientationHeading) {
+            return false;
+        }
+
+        state.headingDegrees = normalizeDegrees(heading);
+        state.isHeadingAvailable = true;
+
+        if (source === "orientation") {
+            hasOrientationHeading = true;
+            state.orientationError = null;
+        }
+
+        return true;
     };
 
     const updateHeading = (event) => {
@@ -29,14 +58,7 @@ window.paqueGo = (() => {
             heading = 360 - event.alpha;
         }
 
-        if (typeof heading === "number" && !Number.isNaN(heading)) {
-            state.headingDegrees = normalizeDegrees(heading);
-            state.isHeadingAvailable = true;
-            state.orientationError = null;
-            return;
-        }
-
-        state.isHeadingAvailable = false;
+        setHeading(heading, "orientation");
     };
 
     const ensureOrientationListener = () => {
@@ -62,8 +84,7 @@ window.paqueGo = (() => {
                 state.geolocationError = null;
 
                 if (typeof position.coords.heading === "number" && !Number.isNaN(position.coords.heading)) {
-                    state.headingDegrees = normalizeDegrees(position.coords.heading);
-                    state.isHeadingAvailable = true;
+                    setHeading(position.coords.heading, "geolocation");
                 }
             },
             (error) => {
@@ -82,6 +103,8 @@ window.paqueGo = (() => {
             navigator.geolocation.clearWatch(watchId);
             watchId = null;
         }
+
+        hasOrientationHeading = false;
 
         if (orientationHandler) {
             window.removeEventListener("deviceorientation", orientationHandler, true);
