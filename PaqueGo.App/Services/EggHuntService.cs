@@ -221,6 +221,27 @@ public sealed class EggHuntService(HttpClient httpClient, IJSRuntime jsRuntime) 
     }
 
     /// <summary>
+    /// Requests the current device location and updates the latest sensor snapshot.
+    /// </summary>
+    /// <returns>The refreshed sensor snapshot.</returns>
+    public async Task<SensorSnapshot> RequestCurrentLocationAsync()
+    {
+        try
+        {
+            Snapshot = await jsRuntime.InvokeAsync<SensorSnapshot>("paqueGo.requestCurrentPosition");
+        }
+        catch (JSException)
+        {
+            Snapshot = new SensorSnapshot();
+        }
+
+        RecomputeDerivedState();
+        await PushBearingToJsAsync();
+        NotifyStateChanged();
+        return Snapshot;
+    }
+
+    /// <summary>
     /// Attempts to switch the browser into fullscreen mode.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>

@@ -1,6 +1,7 @@
 @page "/"
 @inject EggHuntService HuntService
 @inject NavigationManager Navigation
+@using System.Globalization
 
 <PageTitle>Chasse aux trésors de Pâque</PageTitle>
 
@@ -137,6 +138,15 @@
 						</MudItem>
 					</MudGrid>
 
+					<MudButton Variant="Variant.Outlined"
+							   Color="Color.Primary"
+							   StartIcon="@Icons.Material.Filled.MyLocation"
+							   OnClick="@UseCurrentLocationAsync"
+							   Disabled="@isUsingCurrentLocation"
+							   Class="builder-add-button">
+						@(isUsingCurrentLocation ? "Localisation..." : "Utiliser ma position")
+					</MudButton>
+
 					<MudButton Variant="Variant.Filled"
 							   Color="Color.Success"
 							   StartIcon="@Icons.Material.Filled.Add"
@@ -214,6 +224,7 @@
 	private double? pointLongitude;
 	private string? pageMessage;
 	private bool pageMessageIsError;
+	private bool isUsingCurrentLocation;
 
 	private bool CanAddPoint =>
 		!string.IsNullOrWhiteSpace(pointName) &&
@@ -266,6 +277,42 @@
 		pointLongitude = null;
 		pageMessageIsError = false;
 		pageMessage = "Le point a été ajouté à la chasse.";
+	}
+
+	private async Task UseCurrentLocationAsync()
+	{
+		isUsingCurrentLocation = true;
+		pageMessage = null;
+		pageMessageIsError = false;
+
+		try
+		{
+			var snapshot = await HuntService.RequestCurrentLocationAsync();
+
+			if (snapshot.Latitude is not double latitude || snapshot.Longitude is not double longitude)
+			{
+				pageMessageIsError = true;
+				pageMessage = !string.IsNullOrWhiteSpace(snapshot.GeolocationError)
+					? snapshot.GeolocationError
+					: "La position actuelle n'a pas pu etre recuperee.";
+				return;
+			}
+
+			pointLatitude = latitude;
+			pointLongitude = longitude;
+			pageMessage = snapshot.AccuracyMeters is double accuracyMeters
+				? $"Position actuelle inseree automatiquement ({accuracyMeters.ToString("0.0", CultureInfo.CurrentCulture)} m de precision)."
+				: "Position actuelle inseree automatiquement.";
+		}
+		catch (Exception exception)
+		{
+			pageMessageIsError = true;
+			pageMessage = $"La position actuelle n'a pas pu etre recuperee : {exception.Message}";
+		}
+		finally
+		{
+			isUsingCurrentLocation = false;
+		}
 	}
 
 	private void RemovePoint(string pointId)

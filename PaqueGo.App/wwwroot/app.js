@@ -101,6 +101,16 @@ window.paqueGo = (() => {
         needle.style.transform = `rotate(${rotation.toFixed(1)}deg)`;
     };
 
+    const applyPositionSnapshot = (position) => {
+        state.latitude = position.coords.latitude;
+        state.longitude = position.coords.longitude;
+        state.accuracyMeters = position.coords.accuracy;
+        state.isLocationAvailable = true;
+        state.geolocationError = null;
+
+        return { ...state };
+    };
+
     const getAudioContextCtor = () => window.AudioContext || window.webkitAudioContext;
 
     const disconnectNode = (node) => {
@@ -940,11 +950,7 @@ window.paqueGo = (() => {
 
         watchId = navigator.geolocation.watchPosition(
             (position) => {
-                state.latitude = position.coords.latitude;
-                state.longitude = position.coords.longitude;
-                state.accuracyMeters = position.coords.accuracy;
-                state.isLocationAvailable = true;
-                state.geolocationError = null;
+                applyPositionSnapshot(position);
             },
             (error) => {
                 state.isLocationAvailable = false;
@@ -956,6 +962,30 @@ window.paqueGo = (() => {
                 timeout: 15000
             });
     };
+
+    const requestCurrentPosition = () => new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            state.isLocationAvailable = false;
+            state.geolocationError = "La geolocalisation n'est pas disponible sur cet appareil.";
+            resolve({ ...state });
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                resolve(applyPositionSnapshot(position));
+            },
+            (error) => {
+                state.isLocationAvailable = false;
+                state.geolocationError = error.message || "Impossible de lire la position du telephone.";
+                resolve({ ...state });
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 15000
+            });
+    });
 
     const stopSensors = () => {
         if (watchId !== null && navigator.geolocation) {
@@ -1093,6 +1123,7 @@ window.paqueGo = (() => {
         localStorageRemove,
         localStorageSet,
         requestMotionPermission,
+        requestCurrentPosition,
         setTargetBearing,
         startSensors,
         stopAllAudio,
