@@ -945,10 +945,6 @@ window.paqueGo = (() => {
                 state.accuracyMeters = position.coords.accuracy;
                 state.isLocationAvailable = true;
                 state.geolocationError = null;
-
-                if (typeof position.coords.heading === "number" && !Number.isNaN(position.coords.heading)) {
-                    setHeading(position.coords.heading, "geolocation");
-                }
             },
             (error) => {
                 state.isLocationAvailable = false;
